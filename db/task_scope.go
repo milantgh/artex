@@ -118,7 +118,7 @@ func (s *AssetStore) AddAutoScope(taskID int64, assetType, domain, rawURL, ip st
 		if d := DomainKey(domain); d != "" {
 			return s.upsertTaskScope(TaskScope{TaskID: taskID, Kind: "subdomain", Domain: d})
 		}
-	case "service", "endpoint":
+	case "service", "endpoint", "llm_endpoint":
 		host := domain
 		if host == "" && rawURL != "" {
 			host, _, _ = parseURL(normalizeURL(rawURL))
@@ -569,7 +569,7 @@ WHERE type='root_domain' AND domain=$1 LIMIT 1`, root).Scan(&id, &companyID)
 			if n.CompanyID > 0 {
 				link(n.Key, companyKey(n.CompanyID))
 			}
-		case "service":
+		case "service", "llm_endpoint":
 			link(n.Key, firstOf(subByDomain[n.Domain], ipByAddr[n.IP], rootByDomain[n.RootDomain]))
 		case "endpoint":
 			host, port := hostPortOf(n)
@@ -586,7 +586,7 @@ WHERE type='root_domain' AND domain=$1 LIMIT 1`, root).Scan(&id, &companyID)
 // coverageNodeLabel picks the human label for a coverage-graph node.
 func coverageNodeLabel(n *CoverageGraphNode) string {
 	switch n.Kind {
-	case "endpoint", "service":
+	case "endpoint", "service", "llm_endpoint":
 		if n.URL != "" {
 			return n.URL
 		}

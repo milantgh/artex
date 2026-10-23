@@ -372,6 +372,117 @@ func TestUpsertHTTPServiceAuthAppend(t *testing.T) {
 }
 
 // =====================================================================
+// LLM Endpoint
+// =====================================================================
+
+func TestUpsertLLMEndpoint(t *testing.T) {
+	d, av2, _ := testSetup(t)
+	defer d.Close()
+
+	sc := 200
+	id1, err := av2.UpsertLLMEndpoint(UpsertLLMEndpointReq{
+		URL:          "https://api.llmtest.example.com/v1",
+		Model:        "gpt-4o",
+		Provider:     "openai",
+		APIType:      "openai_compatible",
+		AuthType:     "bearer",
+		Technologies: []string{"openai", "python"},
+		StatusCode:   &sc,
+		PageTitle:    "OpenAI API",
+		TaskID:       1,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer d.Exec(`DELETE FROM assets WHERE url = 'https://api.llmtest.example.com/v1' OR domain IN ('api.llmtest.example.com','llmtest.example.com')`)
+
+	if id1 == 0 {
+		t.Fatal("expected non-zero id")
+	}
+
+	// type must be llm_endpoint
+	var typ string
+	if err := d.QueryRow(`SELECT type FROM assets WHERE id = $1`, id1).Scan(&typ); err != nil {
+		t.Fatal(err)
+	}
+	if typ != "llm_endpoint" {
+		t.Errorf("type: want llm_endpoint, got %s", typ)
+	}
+
+	// extra must carry kind + LLM fields
+	var kind, model, provider, apiType, authType string
+	if err := d.QueryRow(`SELECT extra->>'kind', extra->>'model', extra->>'provider', extra->>'api_type', extra->>'auth_type' FROM assets WHERE id = $1`, id1).
+		Scan(&kind, &model, &provider, &apiType, &authType); err != nil {
+		t.Fatal(err)
+	}
+	if kind != "llm_endpoint_entity" {
+		t.Errorf("extra.kind: want llm_endpoint_entity, got %s", kind)
+	}
+	if model != "gpt-4o" || provider != "openai" || apiType != "openai_compatible" || authType != "bearer" {
+		t.Errorf("LLM fields not stored: model=%q provider=%q api_type=%q auth_type=%q", model, provider, apiType, authType)
+	}
+
+	// upsert again with different model + extra tech → same id, merge techs, keep kind
+	id2, err := av2.UpsertLLMEndpoint(UpsertLLMEndpointReq{
+		URL:          "https://api.llmtest.example.com/v1",
+		Model:        "gpt-4o-mini",
+		Technologies: []string{"fastapi"},
+		TaskID:       2,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id2 != id1 {
+		t.Errorf("llm_endpoint dedup failed: %d vs %d", id2, id1)
+	}
+
+	var techCnt int
+	d.QueryRow(`SELECT array_length(technologies, 1) FROM assets WHERE id = $1`, id1).Scan(&techCnt)
+	if techCnt != 3 {
+		t.Errorf("technologies merge: want 3, got %d", techCnt)
+	}
+
+	// kind must survive the merge (extra uses || so EXCLUDED.extra keeps kind)
+	var kind2 string
+	d.QueryRow(`SELECT extra->>'kind' FROM assets WHERE id = $1`, id1).Scan(&kind2)
+	if kind2 != "llm_endpoint_entity" {
+		t.Errorf("extra.kind lost on merge: %s", kind2)
+	}
+
+	// empty URL must error
+	if _, err := av2.UpsertLLMEndpoint(UpsertLLMEndpointReq{}); err == nil {
+		t.Error("expected error for empty URL")
+	}
+}
+
+func TestDistinctExtraKinds(t *testing.T) {
+	d, av2, _ := testSetup(t)
+	defer d.Close()
+
+	task, err := d.CreateTask("kinds", "goal", nil, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// two llm_endpoint assets → one distinct kind
+	if _, err := av2.UpsertLLMEndpoint(UpsertLLMEndpointReq{URL: "https://a.kindexample.test/v1", TaskID: task.ID}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := av2.UpsertLLMEndpoint(UpsertLLMEndpointReq{URL: "https://b.kindexample.test/v1", TaskID: task.ID}); err != nil {
+		t.Fatal(err)
+	}
+	defer d.Exec(`DELETE FROM assets WHERE task_ids @> ARRAY[$1]::bigint[]`, task.ID)
+
+	kinds, err := av2.DistinctExtraKinds(task.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(kinds) != 1 || kinds[0] != "llm_endpoint_entity" {
+		t.Errorf("kinds: want [llm_endpoint_entity], got %v", kinds)
+	}
+}
+
+// =====================================================================
 // OtherService
 // =====================================================================
 

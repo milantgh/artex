@@ -520,7 +520,7 @@ WITH matched AS (
     FROM assets a
     JOIN company_scope cs ON cs.kind = 'domain' AND a.root_domain = cs.domain
     WHERE a.company_id IS NULL
-      AND a.type IN ('root_domain','subdomain','service','endpoint')
+      AND a.type IN ('root_domain','subdomain','service','endpoint','llm_endpoint')
       AND a.root_domain IS NOT NULL
     ORDER BY a.id, length(cs.domain) DESC, cs.company_id
 )
@@ -538,7 +538,7 @@ WITH matched AS (
     FROM assets a
     JOIN company_scope cs ON cs.kind IN ('ip','cidr') AND cs.net >>= try_inet(a.ip)
     WHERE a.company_id IS NULL
-      AND a.type IN ('ip','subdomain','service','endpoint')
+      AND a.type IN ('ip','subdomain','service','endpoint','llm_endpoint')
       AND a.ip IS NOT NULL
     ORDER BY a.id, masklen(cs.net) DESC, cs.company_id
 )
@@ -608,7 +608,7 @@ func malformedIPAssetWarning(q malformedIPAssetQueryer) (string, error) {
 SELECT id, ip, count(*) OVER () AS total
 FROM assets
 WHERE ip IS NOT NULL AND ip <> '' AND try_inet(ip) IS NULL
-  AND type IN ('ip','subdomain','service','endpoint')
+  AND type IN ('ip','subdomain','service','endpoint','llm_endpoint')
 ORDER BY id
 LIMIT $1`, malformedIPAssetsSampled)
 	if err != nil {

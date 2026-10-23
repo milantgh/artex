@@ -137,11 +137,41 @@ func wireAgentAugment(pg *db.DB, skillDir string, hostTools func() ([]actool.Cor
 				}
 				return actool.RenderDeferredToolsBlock(reveal)
 			}
+			// Skill Matcher (规则预筛层): parse each visible skill's `when:` block and
+			// prune the menu to skills whose preconditions hold against the current
+			// exploration facts. Skills with no `when:` are always offered. The
+			// filter only affects the available-skills listing — dispatch still goes
+			// through the original registry so MCP unlocking + metering work for any
+			// skill the model names.
+			skillTool := reg.Tool()
+			matcher := agent.NewSkillMatcher(reg.List())
+			if matcher.HasRules() {
+				var facts []*db.Node
+				var assetKinds map[string]bool
+				ri := agent.RunInfoFrom(ctx)
+				if ri.ExplorationID > 0 {
+					facts, _ = pg.Exploration(ri.ExplorationID).ListByKind(db.KindFact, 0)
+				}
+				// Mirror asset-graph extra.kind values (e.g. llm_endpoint_entity
+				// stamped by UpsertLLMEndpoint) into the matcher as virtual fact
+				// keys, so a skill's `fact_exists` rule fires as soon as a matching
+				// asset is registered — without waiting for an explicit fact write.
+				if ri.TaskID > 0 {
+					if kinds, err := pg.Assets().DistinctExtraKinds(ri.TaskID); err == nil && len(kinds) > 0 {
+						assetKinds = make(map[string]bool, len(kinds))
+						for _, k := range kinds {
+							assetKinds[k] = true
+						}
+					}
+				}
+				matched := matcher.MatchWith(facts, assetKinds)
+				skillTool = agent.BuildFilteredSkillTool(matched, reg)
+			}
 			// Attribution for the usage ledger: ToolAugment only gets (ctx, agentKey),
 			// so the run's task/session ids ride in on the ctx (agent.RunInfo). Read it
 			// once here — this closure is rebuilt per run, so the captured value always
 			// belongs to this run.
-			extra = append(extra, meterSkillTool(reg.Tool(), pg, reg, a.Key, agent.RunInfoFrom(ctx)))
+			extra = append(extra, meterSkillTool(skillTool, pg, reg, a.Key, agent.RunInfoFrom(ctx)))
 		}
 
 		// host tools (traffic / orchestration / custom) — added to every agent's base;

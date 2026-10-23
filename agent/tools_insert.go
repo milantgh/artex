@@ -116,6 +116,12 @@ type assetInputItem struct {
 	// ---- endpoint ----
 	Method string           `json:"method"`
 	Params []map[string]any `json:"params"`
+
+	// ---- llm_endpoint ----
+	Model    string `json:"model"`     // e.g. "gpt-4o", "llama3.1"
+	Provider string `json:"provider"`  // e.g. "openai", "ollama", "anthropic"
+	APIType  string `json:"api_type"`  // e.g. "openai_compatible", "anthropic", "ollama"
+	AuthType string `json:"auth_type"` // e.g. "api_key", "bearer", "none"
 }
 
 // insertAssets is the unified insert_assets agent tool.
@@ -123,7 +129,7 @@ func (t *ToolSet) insertAssets() actool.CoreTool {
 	return writeTool(
 		"insert_assets",
 		"批量登记新发现的资产，一次可混合多种类型（type 见枚举）。\n"+
-			"各类型必填字段：root_domain→domain；ip→ip（须为 IPv4/IPv6，非主机名）；subdomain→domain；app→app_name；service(HTTP)→url；service(非HTTP)→service_name+port（ip/domain 至少填一个）；endpoint→url+method。其余字段含义见各自说明。\n"+
+			"各类型必填字段：root_domain→domain；ip→ip（须为 IPv4/IPv6，非主机名）；subdomain→domain；app→app_name；service(HTTP)→url；service(非HTTP)→service_name+port（ip/domain 至少填一个）；endpoint→url+method；llm_endpoint→url（可带 model/provider/api_type/auth_type 等 LLM 字段，extra.kind 自动标记为 llm_endpoint_entity）。其余字段含义见各自说明。\n"+
 			"auth/technologies/params 为追加合并(append)，不覆盖原值。\n"+
 			"返回：{results:[{index,id,type}], errors:[{index,error}]}",
 		obj(map[string]any{
@@ -134,7 +140,7 @@ func (t *ToolSet) insertAssets() actool.CoreTool {
 				"items": obj(map[string]any{
 					"type": map[string]any{
 						"type":        "string",
-						"enum":        []string{"root_domain", "ip", "subdomain", "app", "service", "endpoint"},
+						"enum":        []string{"root_domain", "ip", "subdomain", "app", "service", "endpoint", "llm_endpoint"},
 						"description": "资产类型",
 					},
 					// root_domain / subdomain
@@ -197,6 +203,11 @@ func (t *ToolSet) insertAssets() actool.CoreTool {
 						"description": "请求参数列表，每条含 location(query/body/header/path)/name/value/type（可选，追加不覆盖）",
 						"items":       map[string]any{"type": "object"},
 					},
+					// llm_endpoint
+					"model":     str("模型名，如 gpt-4o / llama3.1（llm_endpoint 可选）"),
+					"provider":  str("提供商，如 openai / ollama / anthropic（llm_endpoint 可选）"),
+					"api_type":  str("API 协议类型，如 openai_compatible / anthropic / ollama（llm_endpoint 可选）"),
+					"auth_type": str("认证方式，如 api_key / bearer / none（llm_endpoint 可选）"),
 				}, "type"),
 			},
 		}, "assets"),
@@ -328,6 +339,24 @@ func (t *ToolSet) insertAssets() actool.CoreTool {
 						TaskID: taskID,
 					})
 
+				case "llm_endpoint":
+					svcIP := item.ServiceIP
+					if svcIP == "" {
+						svcIP = item.IP
+					}
+					id, err = t.as.UpsertLLMEndpoint(db.UpsertLLMEndpointReq{
+						URL:          item.URL,
+						Model:        item.Model,
+						Provider:     item.Provider,
+						APIType:      item.APIType,
+						AuthType:     item.AuthType,
+						Technologies: item.Technologies,
+						StatusCode:   item.StatusCode,
+						PageTitle:    item.PageTitle,
+						IP:           svcIP,
+						TaskID:       taskID,
+					})
+
 				default:
 					errs = append(errs, errEntry{Index: i, Error: "unknown type: " + typ})
 					continue
@@ -362,6 +391,26 @@ func (t *ToolSet) insertAssets() actool.CoreTool {
 						svcIP = item.IP
 					}
 					_ = t.as.AddAutoScope(taskID, typ, item.Domain, item.URL, svcIP)
+				}
+				// 异步资产补全：域名走 DNS 解析；HTTP service/endpoint 走指纹探测
+				// （命中 LLM 服务栈时 enrich 会自动落一条 llm_endpoint，其 extra.kind
+				// 让 Skill Matcher 立即把 llm-redteam 技能暴露给后续 worker）。
+				// enrich 未接线（t.enrich == nil）时静默跳过，不阻塞插入。
+				if t.enrich != nil {
+					switch typ {
+					case "root_domain", "subdomain":
+						if item.Domain != "" {
+							t.enrich.ResolveDomain(id, item.Domain)
+						}
+					case "service":
+						if item.URL != "" {
+							t.enrich.ProbeSite(id, item.URL)
+						}
+					case "endpoint":
+						if item.URL != "" {
+							t.enrich.ProbeSite(id, item.URL)
+						}
+					}
 				}
 			}
 

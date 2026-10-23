@@ -3,10 +3,14 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Autumn-27/artex/db"
+	"github.com/Autumn-27/artex/enrich"
 )
 
 // testDB opens a DB connection, skipping if PG is unavailable.
@@ -446,5 +450,149 @@ func TestInsertAssetsRejectsHostnameIPPerItem(t *testing.T) {
 	}
 	if stored != 0 {
 		t.Fatalf("rejected hostname still stored in assets.ip (%d rows)", stored)
+	}
+}
+
+// =====================================================================
+// TestInsertAssetsTriggersEnrich
+// insert_assets 成功后应按资产类型触发 enrich：
+//   - root_domain / subdomain → ResolveDomain(id, domain)
+//   - service (HTTP) / endpoint → ProbeSite(id, url)
+//   - llm_endpoint / ip / app → 不触发（已显式分类或无 URL 可探）
+// =====================================================================
+
+type mockEnrich struct {
+	resolveCalls []enrichCall
+	probeCalls   []enrichCall
+}
+
+type enrichCall struct {
+	id   int64
+	arg  string
+}
+
+func (m *mockEnrich) ResolveDomain(id int64, host string) {
+	m.resolveCalls = append(m.resolveCalls, enrichCall{id: id, arg: host})
+}
+func (m *mockEnrich) ProbeSite(id int64, url string) {
+	m.probeCalls = append(m.probeCalls, enrichCall{id: id, arg: url})
+}
+
+func TestInsertAssetsTriggersEnrich(t *testing.T) {
+	d := testDB(t)
+	defer d.Close()
+
+	me := &mockEnrich{}
+	ts := NewToolSet(nil, "")
+	ts.SetAssetStore(d.Assets(), d.Companies())
+	ts.SetEnrich(me)
+	ts.SetTaskID(1)
+	defer d.Exec(`DELETE FROM assets WHERE domain IN ('enrich-root-test.com','enrich-sub.enrich-root-test.com') OR url IN ('http://enrich-svc-test.com/','http://enrich-ep-test.com/x')`)
+
+	out := callInsertAssets(t, ts, map[string]any{
+		"assets": []any{
+			map[string]any{"type": "root_domain", "domain": "enrich-root-test.com"},
+			map[string]any{"type": "subdomain", "domain": "enrich-sub.enrich-root-test.com", "record_type": "A", "record_value": []string{"5.6.7.8"}},
+			map[string]any{"type": "service", "url": "http://enrich-svc-test.com/"},
+			map[string]any{"type": "endpoint", "url": "http://enrich-ep-test.com/x", "method": "GET"},
+			map[string]any{"type": "ip", "ip": "5.6.7.9"},
+		},
+	})
+
+	if errs, _ := out["errors"].([]any); len(errs) > 0 {
+		t.Fatalf("unexpected errors: %v", errs)
+	}
+
+	// root_domain + subdomain → 2 ResolveDomain calls
+	if len(me.resolveCalls) != 2 {
+		t.Errorf("ResolveDomain calls: want 2, got %d (%v)", len(me.resolveCalls), me.resolveCalls)
+	}
+	// service + endpoint → 2 ProbeSite calls
+	if len(me.probeCalls) != 2 {
+		t.Errorf("ProbeSite calls: want 2, got %d (%v)", len(me.probeCalls), me.probeCalls)
+	}
+	// ip must not trigger either
+	for _, c := range me.probeCalls {
+		if c.arg == "" {
+			t.Errorf("ProbeSite called with empty url")
+		}
+	}
+}
+
+// TestInsertAssetsNoEnrichWithoutWiring verifies insert_assets still works when
+// no enrich engine is wired (t.enrich == nil) — no panic, no trigger.
+func TestInsertAssetsNoEnrichWithoutWiring(t *testing.T) {
+	d := testDB(t)
+	defer d.Close()
+
+	ts := NewToolSet(nil, "")
+	ts.SetAssetStore(d.Assets(), d.Companies())
+	// intentionally NOT calling ts.SetEnrich
+	defer d.Exec(`DELETE FROM assets WHERE domain='enrich-nil-test.com'`)
+
+	out := callInsertAssets(t, ts, map[string]any{
+		"assets": []any{map[string]any{"type": "root_domain", "domain": "enrich-nil-test.com"}},
+	})
+	if errs, _ := out["errors"].([]any); len(errs) > 0 {
+		t.Fatalf("unexpected errors: %v", errs)
+	}
+}
+
+// TestInsertAssetsServiceAutoDetectsLLMEndpoint is the end-to-end proof of the
+// P4+P5 bridge: a worker inserts an HTTP service whose URL is a mock Ollama
+// server; the wired enrich engine fingerprints it and auto-creates an
+// llm_endpoint asset whose extra.kind lets the Skill Matcher offer llm-redteam.
+func TestInsertAssetsServiceAutoDetectsLLMEndpoint(t *testing.T) {
+	d := testDB(t)
+	defer d.Close()
+
+	task, err := d.CreateTask("e2e-llm-detect", "insert service → auto llm_endpoint", nil, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer d.Exec(`DELETE FROM tasks WHERE id = $1`, task.ID)
+	defer d.Exec(`DELETE FROM assets WHERE task_ids @> ARRAY[$1]::bigint[]`, task.ID)
+
+	// Mock Ollama: fingerprint matches path "/" + body "Ollama is running".
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			w.WriteHeader(200)
+			_, _ = w.Write([]byte("Ollama is running"))
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer srv.Close()
+
+	eng := enrich.New(d.Assets(), func() string { return "" }, 1)
+	defer eng.Close()
+
+	ts := NewToolSet(nil, "")
+	ts.SetAssetStore(d.Assets(), d.Companies())
+	ts.SetEnrich(eng)
+	ts.SetTaskID(task.ID)
+
+	out := callInsertAssets(t, ts, map[string]any{
+		"assets": []any{map[string]any{"type": "service", "url": srv.URL}},
+	})
+	if errs, _ := out["errors"].([]any); len(errs) > 0 {
+		t.Fatalf("unexpected errors: %v", errs)
+	}
+
+	// enrich runs async; poll for the auto-created llm_endpoint.
+	deadline := time.Now().Add(15 * time.Second)
+	var kind string
+	for time.Now().Before(deadline) {
+		err = d.QueryRow(`SELECT extra->>'kind' FROM assets WHERE type='llm_endpoint' AND url=$1`, srv.URL).Scan(&kind)
+		if err == nil {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if err != nil {
+		t.Fatalf("llm_endpoint not auto-created from service insert: %v", err)
+	}
+	if kind != "llm_endpoint_entity" {
+		t.Errorf("extra.kind: want llm_endpoint_entity, got %q", kind)
 	}
 }

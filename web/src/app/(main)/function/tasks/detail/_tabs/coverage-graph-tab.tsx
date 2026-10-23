@@ -4,6 +4,7 @@ import * as React from "react";
 import type { Graph as G6Graph } from "@antv/g6";
 import {
   AppWindow,
+  Bot,
   Building2,
   Globe,
   Link2,
@@ -44,6 +45,7 @@ const kindMeta: Record<Kind, KindMeta> = {
   service: { label: "服务", icon: Radio, iconBg: "bg-amber-500", hex: "#f59e0b", size: 26 },
   app: { label: "App", icon: AppWindow, iconBg: "bg-fuchsia-500", hex: "#d946ef", size: 26 },
   endpoint: { label: "端点", icon: Link2, iconBg: "bg-rose-500", hex: "#f43f5e", size: 20 },
+  llm_endpoint: { label: "LLM端点", icon: Bot, iconBg: "bg-violet-500", hex: "#8b5cf6", size: 22 },
 };
 
 // G6 节点图标用平台一致的 lucide 图标：把 lucide 的 SVG 路径（v1.22）渲染成白色描边的
@@ -78,6 +80,9 @@ const KIND_ICON: Record<Kind, string> = {
   ),
   endpoint: svgUri(
     '<path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/>',
+  ),
+  llm_endpoint: svgUri(
+    '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
   ),
 };
 
@@ -201,7 +206,7 @@ function graphLabel(n: CoverageGraphNode): string {
     if (n.status_code) parts.push(String(n.status_code));
     return parts.length ? parts.join(" · ") : n.domain || n.ip || n.label;
   }
-  if (n.kind === "endpoint" && n.url) {
+  if ((n.kind === "endpoint" || n.kind === "llm_endpoint") && n.url) {
     try {
       return new URL(n.url).pathname || "/";
     } catch {
@@ -580,7 +585,8 @@ function GraphInner({ taskId, coverageEnabled = true }: { taskId: string; covera
             },
           },
           manyBody: {
-            strength: (d: unknown) => (nd(d).kind === "endpoint" || nd(d).fold ? -60 : -200),
+            strength: (d: unknown) =>
+              nd(d).kind === "endpoint" || nd(d).kind === "llm_endpoint" || nd(d).fold ? -60 : -200,
           },
         },
         behaviors: ["drag-element-force", "drag-canvas", "zoom-canvas"],

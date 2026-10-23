@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import {
+  BotIcon,
   BuildingIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -106,6 +107,7 @@ const TABS: { key: string; label: string; icon: LucideIcon }[] = [
   { key: "app", label: "应用", icon: SmartphoneIcon },
   { key: "service", label: "服务", icon: LayoutTemplateIcon },
   { key: "endpoint", label: "接口", icon: LinkIcon },
+  { key: "llm_endpoint", label: "LLM端点", icon: BotIcon },
 ];
 
 export default function AssetsPage() {
@@ -732,6 +734,65 @@ export default function AssetsPage() {
                 </TableCell>
               </TableRow>
             ))}
+          </AssetCard>
+        </TabsContent>
+
+        {/* LLM 端点 */}
+        <TabsContent value="llm_endpoint" className="mt-0 flex min-h-0 flex-1 flex-col gap-2">
+          {searchBox}
+          <AssetCard
+            cols={["", "端点 URL", "模型", "提供商", "API 类型", "认证", "状态码", "指纹", ""]}
+            loaded={loaded}
+            total={total}
+            page={page}
+            size={size}
+            onSize={setSize}
+            onPage={setPage}
+            rows={currentRows}
+            selected={selected}
+            onToggleAll={(ids) => toggleSelectAll(ids)}
+          >
+            {slice(tabData("llm_endpoint")).map((a) => {
+              const extra = a.extra ?? {};
+              return (
+                <TableRow key={a.id} className={selected.has(a.id) ? "bg-muted/40" : undefined}>
+                  <TableCell className="w-8 pr-0">
+                    <Checkbox checked={selected.has(a.id)} onCheckedChange={() => toggleSelect(a.id)} />
+                  </TableCell>
+                  <TableCell className="max-w-sm truncate font-mono text-xs" title={a.url}>
+                    {a.url || "—"}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{(extra.model as string) || "—"}</TableCell>
+                  <TableCell className="text-xs">{(extra.provider as string) || "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">{(extra.api_type as string) || "—"}</TableCell>
+                  <TableCell className="text-xs">{(extra.auth_type as string) || "—"}</TableCell>
+                  <TableCell>
+                    {a.status_code != null ? (
+                      <span className={cn("font-mono font-semibold text-xs tabular-nums", statusTone(a.status_code))}>
+                        {a.status_code}
+                      </span>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Chips items={a.technologies ?? []} />
+                    <CveChips asset={a} />
+                  </TableCell>
+                  <TableCell className="w-8 pl-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-7 text-muted-foreground hover:text-destructive"
+                      onClick={() => openDelete([a.id])}
+                      aria-label={`删除资产 ${a.url || a.id}`}
+                    >
+                      <Trash2Icon className="size-3.5" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </AssetCard>
         </TabsContent>
       </Tabs>

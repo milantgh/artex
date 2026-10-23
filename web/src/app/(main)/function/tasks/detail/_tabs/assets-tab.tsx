@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import {
+  BotIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   GlobeIcon,
@@ -63,6 +64,7 @@ const TABS: { key: NewAssetType; label: string; icon: LucideIcon }[] = [
   { key: "app", label: "应用", icon: SmartphoneIcon },
   { key: "service", label: "服务", icon: LayoutTemplateIcon },
   { key: "endpoint", label: "接口", icon: LinkIcon },
+  { key: "llm_endpoint", label: "LLM端点", icon: BotIcon },
 ];
 
 function firstText(values: Array<string | undefined>, fallback: string): string {
@@ -85,6 +87,10 @@ function assetLabel(asset: Asset): string {
     }
     case "endpoint":
       return firstText([[asset.method, asset.url].filter(Boolean).join(" ")], `#${asset.id}`);
+    case "llm_endpoint": {
+      const model = asset.extra?.model as string | undefined;
+      return firstText([model, asset.url], `#${asset.id}`);
+    }
   }
 }
 
@@ -713,6 +719,51 @@ export function AssetsTab({ taskId }: { taskId: string }) {
                 <TableCell className="w-16">{removeButton(asset)}</TableCell>
               </TableRow>
             ))}
+          </AssetCard>
+        </TabsContent>
+
+        <TabsContent value="llm_endpoint" className="mt-0 flex min-h-0 flex-1 flex-col">
+          <AssetCard
+            cols={["端点 URL", "模型", "提供商", "API 类型", "认证", "状态码", "指纹", "来源", "操作"]}
+            {...commonCardProps}
+          >
+            {rows.map((asset) => {
+              const extra = asset.extra ?? {};
+              const provider = extra.provider as string | undefined;
+              const apiType = extra.api_type as string | undefined;
+              const authType = extra.auth_type as string | undefined;
+              const model = extra.model as string | undefined;
+              return (
+                <TableRow key={asset.id}>
+                  <TableCell className="max-w-sm truncate font-mono text-xs" title={asset.url}>
+                    {asset.url || "—"}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{model || "—"}</TableCell>
+                  <TableCell className="text-xs">{provider || "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">{apiType || "—"}</TableCell>
+                  <TableCell className="text-xs">{authType || "—"}</TableCell>
+                  <TableCell>
+                    {asset.status_code != null ? (
+                      <span
+                        className={cn("font-mono font-semibold text-xs tabular-nums", statusTone(asset.status_code))}
+                      >
+                        {asset.status_code}
+                      </span>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Chips items={asset.technologies ?? []} />
+                    <CveChips asset={asset} />
+                  </TableCell>
+                  <TableCell>
+                    <SourceCell asset={asset} />
+                  </TableCell>
+                  <TableCell className="w-16">{removeButton(asset)}</TableCell>
+                </TableRow>
+              );
+            })}
           </AssetCard>
         </TabsContent>
       </Tabs>

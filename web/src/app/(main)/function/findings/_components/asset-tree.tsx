@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import {
+  BotIcon,
   BuildingIcon,
   ChevronRightIcon,
   CircleDashedIcon,
@@ -30,6 +31,7 @@ const KIND_ICON: Record<FindingAssetKind, LucideIcon> = {
   app: SmartphoneIcon,
   service: LayoutTemplateIcon,
   endpoint: LinkIcon,
+  llm_endpoint: BotIcon,
   none: CircleDashedIcon,
 };
 
@@ -41,6 +43,7 @@ const KIND_LABEL: Record<FindingAssetKind, string> = {
   app: "应用",
   service: "服务",
   endpoint: "接口",
+  llm_endpoint: "LLM端点",
   none: "未关联",
 };
 
@@ -84,7 +87,7 @@ function shortLabel(node: FindingAssetNode, parent?: FindingAssetNode): string {
   if (node.kind === "subdomain" && node.label.endsWith(`.${parent.label}`)) {
     return node.label.slice(0, -(parent.label.length + 1)) || node.label;
   }
-  if (node.kind !== "service" && node.kind !== "endpoint") return node.label;
+  if (node.kind !== "service" && node.kind !== "endpoint" && node.kind !== "llm_endpoint") return node.label;
 
   // 父标签正好是自己的前缀(接口挂在同 URL 的服务下、服务挂在同 IP 下):直接砍掉。
   if (node.label.startsWith(parent.label)) {
@@ -97,7 +100,7 @@ function shortLabel(node: FindingAssetNode, parent?: FindingAssetNode): string {
 
   const url = parseAssetURL(node.label);
   if (!url) return node.label;
-  if (node.kind === "endpoint") return `${url.pathname}${url.search}` || "/";
+  if (node.kind === "endpoint" || node.kind === "llm_endpoint") return `${url.pathname}${url.search}` || "/";
   const scheme = url.protocol.replace(":", "");
   const port = url.port || (url.protocol === "https:" ? "443" : "80");
   return `${scheme} :${port}`;

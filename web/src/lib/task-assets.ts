@@ -4,6 +4,7 @@ const ASSET_TYPE_LABELS: Record<NewAssetType, string> = {
   app: "应用",
   endpoint: "接口",
   ip: "IP",
+  llm_endpoint: "LLM端点",
   root_domain: "根域名",
   service: "服务",
   subdomain: "子域名",

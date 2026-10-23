@@ -46,6 +46,27 @@ func builtinToolsByAgent() map[string][]actool.CoreTool {
 		// pentest（独立渗透 agent）默认绑：查资产 / 插资产 / 报漏洞 / 查漏洞 / 查企业。
 		// 新库由此 seed 写入；老库由 seedPentestDefaultBindings 迁移。
 		"pentest": {ts.listAssets(), ts.insertAssets(), ts.addFinding(), ts.listFindings(), ts.listCompanies(), ts.cveScan(), ts.cveLookup()},
+		// ━━ LLM 安全专家 Agent（AISecurityTest 集成）━━
+		// 共享工具集：资产读写 / 漏洞上报 / CVE 指纹 / 事实记录。各专家经对话页驱动，
+		// 用 llm-redteam skill 执行具体探测，用 record_fact 写 llm_probe_result 去重。
+		"jailbreak": llmExpertTools(ts),
+		"promptinj": llmExpertTools(ts),
+		"dataleak":  llmExpertTools(ts),
+		"override":  llmExpertTools(ts),
+		"audit":     llmExpertTools(ts),
+	}
+}
+
+// llmExpertTools returns the shared tool set bound to every LLM-security expert
+// agent. Centralised so all five experts (jailbreak/promptinj/dataleak/override/
+// audit) carry the same base; the per-expert prompt differentiates behaviour.
+func llmExpertTools(ts *ToolSet) []actool.CoreTool {
+	return []actool.CoreTool{
+		ts.listAssets(), ts.insertAssets(),
+		ts.addFinding(), ts.listFindings(),
+		ts.listCompanies(),
+		ts.cveScan(), ts.cveLookup(),
+		ts.recordFact(),
 	}
 }
 
@@ -62,7 +83,7 @@ var defaultUnbound = map[string]bool{"goal_met": true}
 // 多个 agent 都有）合成一条，Agents 取并集；defaultUnbound 里的工具则强制绑定为空。
 func BuiltinToolSeeds() []ToolSeed {
 	byAgent := builtinToolsByAgent()
-	order := []string{"mainagent", "goals", "planner", "worker", "auto", "pentest"}
+	order := []string{"mainagent", "goals", "planner", "worker", "auto", "pentest", "jailbreak", "promptinj", "dataleak", "override", "audit"}
 
 	type acc struct {
 		tool   actool.CoreTool

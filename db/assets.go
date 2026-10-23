@@ -813,6 +813,168 @@ RETURNING id`,
 }
 
 // =====================================================================
+// UpsertLLMEndpoint
+// =====================================================================
+
+// UpsertLLMEndpointReq is the input for UpsertLLMEndpoint. LLM-specific fields
+// (Model, Provider, APIType, AuthType) are stored in assets.extra alongside any
+// caller-supplied Extra keys, so the asset doubles as a normal HTTP service
+// fingerprint and an LLM-endpoint entity for the Skill Matcher (fact_exists:
+// llm_endpoint_entity is produced from these assets' extra.kind).
+type UpsertLLMEndpointReq struct {
+	URL          string
+	Model        string // e.g. "gpt-4o", "llama3.1"
+	Provider     string // e.g. "openai", "ollama", "anthropic"
+	APIType      string // e.g. "openai_compatible", "anthropic", "ollama"
+	AuthType     string // e.g. "api_key", "bearer", "none"
+	Technologies []string
+	StatusCode   *int
+	PageTitle    string
+	IP           string
+	TaskID       int64
+	Extra        map[string]any
+}
+
+// UpsertLLMEndpoint inserts or merges an LLM endpoint asset. It is structurally
+// an HTTP service (type='llm_endpoint') so it inherits URL/domain/port parsing
+// and host-asset linking, but is kept distinct so the Skill Matcher and the
+// LLM expert agents can target only LLM-capable targets.
+func (s *AssetStore) UpsertLLMEndpoint(req UpsertLLMEndpointReq) (int64, error) {
+	if req.URL == "" {
+		return 0, fmt.Errorf("url is required")
+	}
+	if err := ValidateAssetIP(req.IP); err != nil {
+		return 0, err
+	}
+	if s.tx == nil {
+		return s.withCompanyScopeMutation(func(scoped *AssetStore) (int64, error) {
+			return scoped.UpsertLLMEndpoint(req)
+		})
+	}
+	normURL := normalizeURL(req.URL)
+	domain, port, serviceName := parseURL(normURL)
+	rootDomain, _ := RootDomain(domain)
+	if rootDomain == "" {
+		rootDomain = domain
+	}
+
+	cseg := calcCSegment(req.IP)
+	companyID, err := s.resolveCompanyWithICP(rootDomain, req.IP, "")
+	if err != nil {
+		return 0, err
+	}
+
+	var taskIDs string
+	if req.TaskID > 0 {
+		taskIDs = fmt.Sprintf("{%d}", req.TaskID)
+	} else {
+		taskIDs = "{}"
+	}
+
+	techsArr := marshalStringArray(req.Technologies)
+	// Merge LLM-specific fields into extra; mark kind=llm_endpoint_entity so the
+	// Skill Matcher's fact_exists rule can match (the enrich step mirrors this
+	// kind into the exploration graph as a fact).
+	extra := map[string]any{"kind": "llm_endpoint_entity"}
+	if req.Model != "" {
+		extra["model"] = req.Model
+	}
+	if req.Provider != "" {
+		extra["provider"] = req.Provider
+	}
+	if req.APIType != "" {
+		extra["api_type"] = req.APIType
+	}
+	if req.AuthType != "" {
+		extra["auth_type"] = req.AuthType
+	}
+	for k, v := range req.Extra {
+		if v == nil {
+			continue
+		}
+		if _, exists := extra[k]; !exists {
+			extra[k] = v
+		}
+	}
+	extraJSON := "{}"
+	if b, err := json.Marshal(extra); err == nil {
+		extraJSON = string(b)
+	}
+
+	var domainVal, ipVal, csegVal, titleVal any
+	if domain != "" {
+		domainVal = domain
+	}
+	if req.IP != "" {
+		ipVal = req.IP
+	}
+	if cseg != "" {
+		csegVal = cseg
+	}
+	if req.PageTitle != "" {
+		titleVal = req.PageTitle
+	}
+
+	var id int64
+	err = s.tx.QueryRow(`
+INSERT INTO assets(
+    type, url, service_type, service_name, domain, ip, port, root_domain,
+    c_segment, technologies, status_code, page_title,
+    company_id, company_source, task_ids, extra
+)
+VALUES (
+    'llm_endpoint', $1, 'http', $2, $3, $4, $5, $6,
+    $7::cidr, $8::text[], $9, $10,
+    $11, 'scope', $12::bigint[], $13::jsonb
+)
+ON CONFLICT (url) WHERE type = 'llm_endpoint' DO UPDATE SET
+    status_code  = COALESCE(EXCLUDED.status_code,  assets.status_code),
+    page_title   = COALESCE(EXCLUDED.page_title,   assets.page_title),
+    ip           = COALESCE(EXCLUDED.ip,           assets.ip),
+    c_segment    = COALESCE(EXCLUDED.c_segment,    assets.c_segment),
+    technologies = (SELECT ARRAY(SELECT DISTINCT unnest(assets.technologies || EXCLUDED.technologies))),
+    extra        = assets.extra || EXCLUDED.extra,
+    task_ids     = (SELECT ARRAY(SELECT DISTINCT unnest(assets.task_ids || EXCLUDED.task_ids))),
+    company_id   = CASE
+        WHEN assets.company_source = 'explicit' AND assets.company_id IS NOT NULL THEN assets.company_id
+        ELSE COALESCE(EXCLUDED.company_id, assets.company_id)
+    END,
+    company_source = CASE
+        WHEN assets.company_source = 'explicit' AND assets.company_id IS NOT NULL THEN 'explicit'
+        WHEN EXCLUDED.company_id IS NOT NULL THEN 'scope'
+        ELSE assets.company_source
+    END,
+    last_seen = now()
+RETURNING id`,
+		normURL, serviceName, domainVal, ipVal, nullableInt(port), rootDomain,
+		csegVal, techsArr, req.StatusCode, titleVal,
+		companyID, taskIDs, extraJSON,
+	).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+
+	s.linkHostAssets(domain, rootDomain, req.TaskID)
+	if req.IP != "" {
+		var boundDomains []string
+		if domain != "" {
+			boundDomains = []string{domain}
+		}
+		var openPorts []PortService
+		if port > 0 {
+			openPorts = []PortService{{Port: port, Service: serviceName}}
+		}
+		_, _ = s.UpsertIP(UpsertIPReq{
+			IP:           req.IP,
+			BoundDomains: boundDomains,
+			OpenPorts:    openPorts,
+			TaskID:       req.TaskID,
+		})
+	}
+	return id, nil
+}
+
+// =====================================================================
 // UpsertOtherService
 // =====================================================================
 
@@ -1207,6 +1369,35 @@ func (s *AssetStore) CountByTask(taskID int64, typ string) (int, error) {
 	var n int
 	err := s.db.QueryRow(q, args...).Scan(&n)
 	return n, err
+}
+
+// DistinctExtraKinds returns the distinct non-empty values of assets.extra->>'kind'
+// for assets that belong to the given task. The Skill Matcher uses these as
+// virtual fact keys so a skill whose `when` rule requires a fact like
+// `llm_endpoint_entity` is offered as soon as a matching asset exists, even
+// before an explicit exploration fact is recorded.
+func (s *AssetStore) DistinctExtraKinds(taskID int64) ([]string, error) {
+	rows, err := s.db.Query(`
+SELECT DISTINCT extra->>'kind' AS kind
+FROM assets
+WHERE $1 = ANY(task_ids)
+  AND extra ? 'kind'
+  AND extra->>'kind' <> ''`, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var k string
+		if err := rows.Scan(&k); err != nil {
+			return nil, err
+		}
+		if k != "" {
+			out = append(out, k)
+		}
+	}
+	return out, rows.Err()
 }
 
 func (s *AssetStore) CountsByTypeForTask(taskID int64) (map[string]int, error) {

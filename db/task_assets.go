@@ -390,6 +390,7 @@ SELECT intent.id, asset.id, asset.type,
          WHEN 'ip' THEN COALESCE(asset.ip,'')
          WHEN 'app' THEN COALESCE(asset.app_name,'')
 		 WHEN 'service' THEN COALESCE(NULLIF(asset.url,''), NULLIF(concat_ws(':', COALESCE(NULLIF(asset.domain,''), NULLIF(asset.ip,'')), asset.port::text),''), NULLIF(asset.service_name,''), '#' || asset.id::text)
+		 WHEN 'llm_endpoint' THEN COALESCE(NULLIF(asset.url,''), NULLIF(concat_ws(':', COALESCE(NULLIF(asset.domain,''), NULLIF(asset.ip,'')), asset.port::text),''), NULLIF(asset.service_name,''), '#' || asset.id::text)
          WHEN 'endpoint' THEN COALESCE(NULLIF(asset.url,''), '#' || asset.id::text)
          ELSE '#' || asset.id::text
        END,

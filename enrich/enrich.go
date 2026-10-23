@@ -242,7 +242,7 @@ func (e *Engine) doHTTP(id int64, rawURL string) {
 	statusCode := resp.StatusCode
 	bodyLen := int64(len(body))
 	title := extractTitle(body)
-	techs, extra := fingerprintTech(rawURL, statusCode, resp.Header, body)
+	techs, extra, detected := fingerprintTech(rawURL, statusCode, resp.Header, body)
 	_, _ = e.as.UpsertHTTPService(db.UpsertHTTPServiceReq{
 		URL:           rawURL,
 		StatusCode:    &statusCode,
@@ -251,6 +251,24 @@ func (e *Engine) doHTTP(id int64, rawURL string) {
 		Technologies:  techs,
 		Extra:         extra,
 	})
+	// If the fingerprint matches a known LLM-serving component, also record an
+	// llm_endpoint asset. Its extra.kind=llm_endpoint_entity lets the Skill
+	// Matcher offer the llm-redteam skill without waiting for an explicit fact.
+	if provider, apiType, ok := detectLLMEndpoint(detected); ok {
+		var taskID int64
+		if src, err := e.as.GetByIDs([]int64{id}); err == nil && len(src) > 0 && len(src[0].TaskIDs) > 0 {
+			taskID = src[0].TaskIDs[0]
+		}
+		_, _ = e.as.UpsertLLMEndpoint(db.UpsertLLMEndpointReq{
+			URL:          rawURL,
+			Provider:     provider,
+			APIType:      apiType,
+			Technologies: techs,
+			StatusCode:   &statusCode,
+			PageTitle:    title,
+			TaskID:       taskID,
+		})
+	}
 }
 
 // fingerprintTech runs the local fingerprint + CVE rule pack against the page
@@ -258,16 +276,16 @@ func (e *Engine) doHTTP(id int64, rawURL string) {
 // auto-enrichment stays cheap; matched components and their version-attributable
 // CVE counts land in the asset graph (technologies + extra) for the agents to act
 // on without re-scanning.
-func fingerprintTech(rawURL string, status int, header http.Header, body []byte) ([]string, map[string]any) {
+func fingerprintTech(rawURL string, status int, header http.Header, body []byte) ([]string, map[string]any, []cve.Detected) {
 	eng, err := cve.Shared()
 	if err != nil {
-		return nil, nil
+		return nil, nil, nil
 	}
 	detected := eng.FingerprintFrom(context.Background(), rawURL, &cve.Response{
 		Status: status, Header: header, Body: body,
 	})
 	if len(detected) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 	techs := make([]string, 0, len(detected))
 	comps := make([]map[string]any, 0, len(detected))
@@ -310,7 +328,65 @@ func fingerprintTech(rawURL string, status int, header http.Header, body []byte)
 	if maxSeverity != "" {
 		extra["cve_max_severity"] = maxSeverity
 	}
-	return techs, extra
+	return techs, extra, detected
+}
+
+// llmComponents maps fingerprint component IDs to the LLM provider / API type
+// they expose. Components not listed here are treated as non-LLM even if they
+// happen to proxy LLM traffic (the agent can still insert an llm_endpoint
+// manually via insert_assets).
+var llmComponents = map[string]struct {
+	provider string
+	apiType  string
+}{
+	"ollama":                  {"ollama", "ollama"},
+	"openai-compatible":       {"openai", "openai_compatible"},
+	"vllm":                    {"vllm", "openai_compatible"},
+	"llamafactory":            {"llamafactory", "openai_compatible"},
+	"lmdeploy":                {"lmdeploy", "openai_compatible"},
+	"sglang":                  {"sglang", "openai_compatible"},
+	"xinference":              {"xinference", "openai_compatible"},
+	"text-generation-webui":   {"text-generation-webui", "openai_compatible"},
+	"llama-cpp":               {"llama-cpp", "openai_compatible"},
+	"koboldcpp":               {"koboldcpp", "openai_compatible"},
+	"localai":                 {"localai", "openai_compatible"},
+	"lm-studio":               {"lm-studio", "openai_compatible"},
+	"mlc-llm":                 {"mlc-llm", "openai_compatible"},
+	"tensorrt-llm":            {"tensorrt-llm", "openai_compatible"},
+	"triton-inference-server": {"triton", "openai_compatible"},
+	"petals":                  {"petals", "openai_compatible"},
+	"new-api":                 {"new-api", "openai_compatible"},
+	"one-api":                 {"one-api", "openai_compatible"},
+	"cloudflare-ai-gateway":   {"cloudflare", "openai_compatible"},
+	"portkey-ai-gateway":      {"portkey", "openai_compatible"},
+	"fireworks-ai":            {"fireworks", "openai_compatible"},
+	"together-ai":             {"together", "openai_compatible"},
+	"groq":                    {"groq", "openai_compatible"},
+	"network-ai":              {"network-ai", "openai_compatible"},
+	"onyx":                    {"onyx", "openai_compatible"},
+	"kubeai":                  {"kubeai", "openai_compatible"},
+	"ray":                     {"ray", "openai_compatible"},
+	"fastchat":                {"fastchat", "openai_compatible"},
+	"open-webui":              {"open-webui", "openai_compatible"},
+	"librechat":               {"librechat", "openai_compatible"},
+	"nextchat":                {"nextchat", "openai_compatible"},
+	"lollms":                  {"lollms", "openai_compatible"},
+	"sillytavern":             {"sillytavern", "openai_compatible"},
+	"aphrodite-engine":        {"aphrodite", "openai_compatible"},
+	"jan":                     {"jan", "openai_compatible"},
+	"lightllm":                {"lightllm", "openai_compatible"},
+}
+
+// detectLLMEndpoint inspects fingerprint detections and returns the first
+// LLM-serving component's provider/api-type. The first match wins because a
+// target typically exposes one LLM stack.
+func detectLLMEndpoint(detected []cve.Detected) (provider, apiType string, ok bool) {
+	for _, d := range detected {
+		if info, exists := llmComponents[d.ID]; exists {
+			return info.provider, info.apiType, true
+		}
+	}
+	return "", "", false
 }
 
 func extractTitle(body []byte) string {

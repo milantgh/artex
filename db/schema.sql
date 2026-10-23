@@ -40,7 +40,7 @@ CREATE TRIGGER trg_companies_upd BEFORE UPDATE ON companies
 CREATE TABLE IF NOT EXISTS assets (
     id              BIGSERIAL PRIMARY KEY,
     type            TEXT NOT NULL CHECK (type IN (
-                        'root_domain','ip','subdomain','app','service','endpoint'
+                        'root_domain','ip','subdomain','app','service','endpoint','llm_endpoint'
                     )),
     company_id      BIGINT REFERENCES companies(id) ON DELETE SET NULL,
     -- explicit: caller/user selected the company; scope: derived from company_scope.
@@ -89,6 +89,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_av2_service_http ON assets(url) WHERE type 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_av2_service_other
     ON assets(COALESCE(domain,''), COALESCE(ip,''), port, service_name) WHERE type = 'service' AND service_type = 'other';
 CREATE UNIQUE INDEX IF NOT EXISTS uq_av2_endpoint     ON assets(url, method) WHERE type = 'endpoint';
+CREATE UNIQUE INDEX IF NOT EXISTS uq_av2_llm_endpoint ON assets(url) WHERE type = 'llm_endpoint';
 CREATE INDEX IF NOT EXISTS idx_av2_company      ON assets(company_id)       WHERE company_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_av2_company_type ON assets(company_id, type) WHERE company_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_av2_task_ids     ON assets USING GIN(task_ids);
@@ -101,6 +102,21 @@ CREATE INDEX IF NOT EXISTS idx_av2_bound_domains ON assets USING GIN(bound_domai
 CREATE INDEX IF NOT EXISTS idx_av2_open_ports   ON assets USING GIN(open_ports)    WHERE type = 'ip';
 CREATE INDEX IF NOT EXISTS idx_av2_last_seen    ON assets(last_seen DESC);
 CREATE INDEX IF NOT EXISTS idx_av2_type_seen    ON assets(type, last_seen DESC);
+-- assets_type_check: recreate when it lacks the 'llm_endpoint' branch so existing
+-- installations can store LLM-capable HTTP targets as a distinct asset type.
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conrelid='assets'::regclass
+          AND conname='assets_type_check'
+          AND pg_get_constraintdef(oid) NOT LIKE '%llm_endpoint%'
+    ) THEN
+        ALTER TABLE assets DROP CONSTRAINT assets_type_check;
+        ALTER TABLE assets ADD CONSTRAINT assets_type_check
+            CHECK (type IN ('root_domain','ip','subdomain','app','service','endpoint','llm_endpoint'));
+    END IF;
+END $$;
 ALTER TABLE assets ADD COLUMN IF NOT EXISTS company_source TEXT;
 UPDATE assets SET company_source = 'explicit' WHERE company_source IS NULL;
 ALTER TABLE assets ALTER COLUMN company_source SET DEFAULT 'explicit';

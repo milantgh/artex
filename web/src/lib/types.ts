@@ -217,7 +217,7 @@ export interface TaskAssetView {
 }
 
 // ---- New unified asset model (new backend) ----
-export type NewAssetType = "root_domain" | "ip" | "subdomain" | "app" | "service" | "endpoint";
+export type NewAssetType = "root_domain" | "ip" | "subdomain" | "app" | "service" | "endpoint" | "llm_endpoint";
 
 export interface Asset {
   id: number;
@@ -288,7 +288,7 @@ export interface TaskAssetScopeMutation {
 // 无资产行的根域名="r:<domain>"。in_scope=false 的是仅用于连线的灰色上下文节点。
 export interface CoverageGraphNode {
   key: string;
-  kind: "company" | "root_domain" | "subdomain" | "ip" | "service" | "app" | "endpoint";
+  kind: "company" | "root_domain" | "subdomain" | "ip" | "service" | "app" | "endpoint" | "llm_endpoint";
   label: string;
   tested: boolean;
   in_scope: boolean;
@@ -584,7 +584,7 @@ export interface FindingQuery {
 }
 
 // ---- Findings by asset (资产视图) ----
-export type FindingAssetKind = "company" | "root_domain" | "subdomain" | "ip" | "service" | "app" | "endpoint" | "none";
+export type FindingAssetKind = "company" | "root_domain" | "subdomain" | "ip" | "service" | "app" | "endpoint" | "llm_endpoint" | "none";
 
 // FindingAssetNode 是资产树的一个节点。key 形如 a:<id>(资产)、c:<id>(企业)、
 // r:<domain>(库里没有资产行的根域名)、__none__(未关联资产)。

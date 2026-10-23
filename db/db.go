@@ -211,6 +211,13 @@ var builtinAgents = []builtinAgent{
 	{"auto", "Auto", "assistant", "平台操作助手：用工具管理任务(建/看/暂停/给提示)与资产，并可创建/修改 skill、自定义工具、MCP。", nil, false, nil},
 	// 渗透测试:内置「独立渗透」agent。经对话页驱动,一人从侦察到收尾走完整条渗透链,自己规划自己执行自己验证。默认开启交互式 shell。
 	{"pentest", "渗透测试", "assistant", "独立渗透 agent：一人从侦察→找攻击面→深入利用→验证→收尾走完整条链，自己规划、自己执行、自己对抗式验证。", nil, true, intp(0)},
+	// ━━ LLM 安全专家 Agent（AISecurityTest 集成）━━
+	// 经对话页驱动，各自专精一个 LLM 攻击面；默认可见 llm-redteam skill，可用 cve_scan/cve_lookup 指纹引擎。
+	{"jailbreak", "越狱专家", "assistant", "LLM 越狱测试专家：构造角色绕过/前缀注入/编码混淆等 payload，验证模型是否输出受限内容。", nil, true, intp(0)},
+	{"promptinj", "提示注入专家", "assistant", "提示注入测试专家：通过直接/间接注入（文档、搜索结果、工具返回）覆盖系统指令，测试指令隔离强度。", nil, true, intp(0)},
+	{"dataleak", "数据泄露专家", "assistant", "数据泄露测试专家：探测系统提示词泄露、训练数据记忆、上下文越权读取等敏感信息外泄面。", nil, true, intp(0)},
+	{"override", "越权覆盖专家", "assistant", "越权/覆盖测试专家：测试工具调用劫持、函数调用注入、间接提示注入导致的越权操作。", nil, true, intp(0)},
+	{"audit", "LLM审计专家", "assistant", "LLM 安全审计专家：综合记录所有请求/响应，形成可追溯证据链，输出 LLM 安全审计结论。", nil, true, intp(0)},
 }
 
 // seedBuiltins inserts the fixed built-in agents and their variable catalog (idempotent).
@@ -322,7 +329,8 @@ ON CONFLICT DO NOTHING`, r.kind, r.pattern, r.note); err != nil {
 // declares `mcps: ScopeSentry`, which only takes effect once it's made visible and
 // that MCP is enabled/configured.
 var builtinSkillVisibility = map[string][]string{
-	"api-recon": {"auto", "pentest", "worker"},
+	"api-recon":   {"auto", "pentest", "worker"},
+	"llm-redteam": {"pentest", "jailbreak", "promptinj", "dataleak", "override", "audit"},
 }
 
 // seedBuiltinSkillVisibility binds the shipped built-in skills to their default
