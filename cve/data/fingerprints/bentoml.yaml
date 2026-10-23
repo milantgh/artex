@@ -1,0 +1,15 @@
+id: bentoml
+name: bentoml
+category: ai-infra
+description: BentoML is a Python library for building online serving systems optimized for AI apps and model inference.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)BentoML\ Prediction\ Service
+  - method: GET
+    path: /docs.json
+    body_regex: (?is)^(?=.*BentoML\ Team)(?=.*contact@bentoml\.com)
+  - method: GET
+    path: /metrics
+    body_regex: (?is)bentoml_api_server

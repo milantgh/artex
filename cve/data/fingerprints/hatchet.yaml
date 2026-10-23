@@ -1,0 +1,16 @@
+id: hatchet
+name: Hatchet
+category: ai-infra
+description: Hatchet (hatchet-dev/hatchet) is an open-source orchestration engine for background tasks, AI agents, and durable workflows. Self-hosted deployments expose an API server (default :8080), a Dashboard web UI, and a gRPC engine (:7077).
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Hatchet</title>
+  - method: GET
+    path: /api/v1/meta
+    body_regex: (?is)^(?=.*"allowSignup")(?=.*"allowCreateTenant")(?=.*"allowChangePassword")
+version:
+  method: GET
+  path: /api/v1/version
+  body_regex: '"version"\s*:\s*"([0-9]+\.[0-9]+\.[0-9]+[^"]*)"'

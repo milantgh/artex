@@ -1,0 +1,12 @@
+id: mlc-llm
+name: mlc-llm
+category: ai-infra
+description: MLC LLM - Universal deployment engine for LLMs with ML compilation optimization.
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"MLC\-LLM"
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)/microserving/prep_recv

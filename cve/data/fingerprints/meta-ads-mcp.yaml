@@ -1,0 +1,9 @@
+id: meta-ads-mcp
+name: meta-ads-mcp
+category: ai-infra
+description: Meta Ads MCP is a Model Context Protocol (MCP) server from the Pipeboard MCP family that enables AI assistants to manage Meta (Facebook) advertising campaigns via the Meta Graph API. Runs as a Streamable HTTP server on port 8080 by default, supporting Bearer-token and Pipeboard-token authentication via AuthInjectionMiddleware.
+match:
+  any:
+  - method: POST
+    path: /mcp
+    body_regex: (?is)^(?=.*jsonrpc)(?=.*meta\-ads\-mcp)

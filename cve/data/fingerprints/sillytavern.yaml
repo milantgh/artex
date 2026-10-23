@@ -1,0 +1,12 @@
+id: sillytavern
+name: sillytavern
+category: ai-infra
+description: SillyTavern - LLM frontend for roleplay/chat with character cards and multi-model support.
+match:
+  any:
+  - method: GET
+    path: /manifest.json
+    body_regex: (?is)"name":\ "SillyTavern"
+  - method: GET
+    path: /version
+    body_regex: (?is)^(?=.*SillyTavern)(?=.*"pkgVersion")

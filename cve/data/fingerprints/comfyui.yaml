@@ -1,0 +1,14 @@
+id: comfyui
+name: ComfyUI
+category: ai-app
+description: "ComfyUI 节点式生成式 AI（Stable Diffusion 等）前端"
+match:
+  any:
+    - path: /
+      status: 200
+      body_contains: "ComfyUI"
+    - path: /system_stats
+      status: 200
+      body_regex: '"system"\s*:'
+version:
+  body_regex: "ComfyUI[^0-9]{0,8}([0-9]+\\.[0-9.]+)"

@@ -1,0 +1,9 @@
+id: langchain
+name: langchain
+category: ai-infra
+description: 一个灵活的开源框架，用于构建利用大语言模型与外部数据源的应用。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Chat\ LangChain</title>

@@ -1,0 +1,18 @@
+id: tensorrt-llm
+name: tensorrt-llm
+category: ai-infra
+description: NVIDIA TensorRT-LLM inference server (trtllm-serve) for high-performance LLM deployment.
+match:
+  any:
+  - method: GET
+    path: /metrics
+    body_regex: (?is)^(?=.*inflightBatchingStats)(?=.*kvCacheStats)
+  - method: GET
+    path: /health_generate
+    body_regex: (?is)Generation\ health\ check\ OK
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":"tensorrt_llm"
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":\ "tensorrt_llm"

@@ -1,0 +1,16 @@
+id: langfuse
+name: langfuse
+category: ai-infra
+description: 一个开源的可观测性和分析平台，专为由大型语言模型（LLM）驱动的应用而设计。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)alt="Langfuse\ Icon"
+  - method: GET
+    path: /
+    body_regex: (?is)data\-sentry\-component="LangfuseIcon"
+version:
+  method: GET
+  path: /api/trpc/public.checkUpdate
+  body_regex: '"currentVersion":"v(\d+\.\d+\.\d+)"'

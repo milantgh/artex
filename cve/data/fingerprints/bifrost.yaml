@@ -1,0 +1,12 @@
+id: bifrost
+name: bifrost
+category: ai-infra
+description: Bifrost AI Gateway - High-performance unified LLM gateway by MaximHQ with caching and routing.
+match:
+  any:
+  - method: GET
+    path: /api/config
+    body_regex: (?is)^(?=.*"is_db_connected")(?=.*"framework_config")
+  - method: GET
+    path: /health
+    body_regex: (?is)"db_pings"

@@ -1,0 +1,9 @@
+id: praisonai
+name: praisonai
+category: ai-infra
+description: PraisonAI is a production-ready multi-agent AI teams system that orchestrates AI agents to automate and solve complex tasks. It provides a unified HTTP server with Web UI and REST API.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>PraisonAI</title>

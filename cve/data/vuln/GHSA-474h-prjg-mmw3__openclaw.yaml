@@ -1,0 +1,11 @@
+id: GHSA-474h-prjg-mmw3
+title: OpenClaw 沙箱化的 sessions_spawn(runtime="acp") 绕过沙箱继承并允许主机 ACP 初始化
+component: openclaw
+severity: HIGH
+affected: <=2026.3.1
+description: "摘要\n沙箱化的 sessions_spawn(runtime=\"acp\") 可以绕过沙箱继承并初始化主机端 ACP 运行时。修复现在对来自沙箱化请求者会话的 ACP 生成 进行失败关闭，并拒绝 runtime=\"acp\" 的 sandbox=\"require\"。\n\n受影响的包/版本\n- 包：openclaw（npm）\n- 分类时最新发布的 npm 版本：2026.3.1（2026 年 3 月 2 日）\n- 受影响范围：<=2026.3.1\n- 已修复版本：2026.3.2（已发布）\n\n技术详情\n- 根本原因：runtime=\"subagent\" 强制执行了沙箱继承，而 runtime=\"acp\" 未强制执行等效的沙箱/运行时检查。\n- 安全影响：沙箱边界绕过进入主机端 ACP 初始化。\n- 修复行为：\n  - 当请求者运行时为沙箱化时拒绝 ACP 生成\n  - 拒绝带有 runtime=\"acp\"、sandbox=\"require\" 的 sessions_spawn\n  - 调整沙箱化提示引导以避免宣传被阻止的 ACP 路径"
+references:
+- https://github.com/openclaw/openclaw/security/advisories/GHSA-474h-prjg-mmw3
+remediation: 升级 openclaw 至 >= 2026.3.2 或更高版本。提交记录 - ac11f0af731d41743ba02d8595f4d0fe747336e3 - c703aa0fe92df9fb71cf254fc46991e05fba2114
+check:
+  mode: version

@@ -1,0 +1,9 @@
+id: localai
+name: localai
+category: ai-infra
+description: 本地化 OpenAI 兼容 API 服务，支持多种开源模型与本地推理后端。
+match:
+  any:
+  - method: GET
+    path: /metrics
+    body_regex: (?is)localai_

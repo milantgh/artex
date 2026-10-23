@@ -1,0 +1,13 @@
+id: mcphub
+name: MCPHub
+category: ai-infra
+description: Self-hosted MCP gateway and management platform for connecting, managing, and operating MCP servers.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>MCPHub\ Dashboard</title>
+version:
+  method: GET
+  path: /config
+  body_regex: '"version"\s*:\s*"([0-9][0-9a-zA-Z.\-]*)"'

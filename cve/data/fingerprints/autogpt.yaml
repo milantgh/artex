@@ -1,0 +1,9 @@
+id: autogpt
+name: AutoGPT
+category: ai-infra
+description: AutoGPT is an open-source workflow automation platform for creating, deploying, and managing continuous AI agents.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>AutoGPT\ Platform</title>

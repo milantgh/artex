@@ -1,0 +1,13 @@
+id: mcp-searxng
+name: mcp-searxng
+category: ai-infra
+description: mcp-searxng is a Model Context Protocol (MCP) server that gives AI assistants web search and URL-reading capabilities through SearXNG. It supports both stdio and HTTP transports. The HTTP transport runs on Express with a /health endpoint and /mcp endpoint for JSON-RPC.
+match:
+  any:
+  - method: GET
+    path: /health
+    body_regex: (?is)^(?=.*ihor\-sokoliuk/mcp\-searxng)(?=.*healthy)
+version:
+  method: GET
+  path: /health
+  body_regex: '"version"\s*:\s*"([0-9][0-9a-zA-Z.\-]*)"'

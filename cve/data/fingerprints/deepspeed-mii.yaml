@@ -1,0 +1,9 @@
+id: deepspeed-mii
+name: deepspeed-mii
+category: ai-infra
+description: DeepSpeed-MII - High-throughput LLM inference powered by DeepSpeed with OpenAI-compatible API.
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"deepspeed\-mii"

@@ -1,0 +1,9 @@
+id: petals
+name: petals
+category: ai-infra
+description: Petals - Decentralized LLM inference, BitTorrent-style distributed serving for large models.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*Decentralized\ platform\ for\ running\ large\ language\ models)(?=.*petals\-infra)

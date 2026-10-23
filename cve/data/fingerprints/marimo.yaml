@@ -1,0 +1,13 @@
+id: marimo
+name: marimo
+category: ai-infra
+description: 一款响应式的Python笔记本，具有优秀的可复现性，原生支持Git，并可作为脚本或应用程序部署。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>marimo</title>
+version:
+  method: GET
+  path: /api/version
+  body_regex: (\d+\.\d+\.\d+)

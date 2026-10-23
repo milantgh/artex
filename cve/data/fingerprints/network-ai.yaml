@@ -1,0 +1,16 @@
+id: network-ai
+name: Network-AI
+category: ai-infra
+description: Network-AI is a TypeScript/Node.js multi-agent orchestrator with built-in MCP SSE server, exposing HTTP/SSE endpoints for AI agent interaction including blackboard tools, budget/token management, and control-plane operations
+match:
+  any:
+  - method: GET
+    path: /health
+    body_regex: (?is)^(?=.*"status":"ok")(?=.*"bridge":"network\-ai")
+version:
+  method: POST
+  path: /mcp
+  headers:
+    Content-Type: application/json
+  body: '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"aig","version":"0.0.1"}}}'
+  body_regex: '"version"\s*:\s*"([0-9][0-9.a-zA-Z\-]+)"'

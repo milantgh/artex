@@ -1,0 +1,9 @@
+id: salesforce-einstein
+name: salesforce-einstein
+category: ai-infra
+description: Salesforce Einstein Messaging API (MIAW) - AI-powered conversational service.
+match:
+  any:
+  - method: POST
+    path: /iamessage/api/v2/authorization/unauthenticated/access-token
+    body_regex: (?is)^(?=.*"errorCode")(?=.*INVALID_)

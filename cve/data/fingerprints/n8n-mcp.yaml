@@ -1,0 +1,10 @@
+id: n8n-mcp
+name: n8n-mcp
+category: ai-infra
+description: n8n-MCP is a Model Context Protocol (MCP) server that provides AI assistants access to n8n node documentation, properties, and operations. When running in HTTP transport mode (MCP_MODE=http), it exposes a Bearer-authenticated MCP endpoint at /mcp and an unauthenticated health check at /health.
+match:
+  any:
+  - method: GET
+    path: /mcp
+    header_regex:
+      '*': (?is)n8n\-mcp

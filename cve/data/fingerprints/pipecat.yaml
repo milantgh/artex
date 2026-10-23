@@ -1,0 +1,9 @@
+id: pipecat
+name: pipecat
+category: ai-infra
+description: Pipecat is an open-source Python framework for building real-time voice and multimodal conversational AI agents, supporting WebSocket and WebRTC transports.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Pipecat\ UI</title>

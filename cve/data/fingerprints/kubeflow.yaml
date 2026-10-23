@@ -1,0 +1,13 @@
+id: kubeflow
+name: kubeflow
+category: ai-infra
+description: 一个开源平台，简化在Kubernetes上部署和管理机器学习工作流，覆盖ML生命周期各阶段。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Kubeflow\ Central\ Dashboard</title>
+version:
+  method: GET
+  path: /api/workgroup/env-info
+  body_regex: '"kubeflowVersion":"([^"]+)"'

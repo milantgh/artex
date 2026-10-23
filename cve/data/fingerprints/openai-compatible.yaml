@@ -1,0 +1,9 @@
+id: openai-compatible
+name: openai-compatible
+category: ai-infra
+description: Generic OpenAI-compatible API endpoint (fallback detection for unidentified LLM services).
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)^(?=.*"object")(?=.*"data")

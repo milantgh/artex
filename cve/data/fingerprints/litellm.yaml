@@ -1,0 +1,25 @@
+id: litellm
+name: LiteLLM
+category: ai-infra
+description: 一个开源的API代理，支持100多个LLM模型，提供OpenAI兼容格式API。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)LiteLLM\ API
+  - method: GET
+    path: /
+    body_regex: (?is)Proxy\ Server\ to\ call\ 100\+\ LLMs\ in\ the\ OpenAI\ format
+  - method: GET
+    path: /
+    body_regex: (?is)LiteLLM\ Admin\ Panel\ on\ /ui
+  - method: GET
+    path: /health
+    body_regex: (?is)"litellm_metadata"
+  - method: GET
+    path: /health/readiness
+    body_regex: (?is)"litellm_version"
+version:
+  method: GET
+  path: /openapi.json
+  body_regex: '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'

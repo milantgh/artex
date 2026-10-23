@@ -1,0 +1,19 @@
+id: cognee
+name: cognee
+category: ai-infra
+description: Cognee is an open-source AI memory platform for AI Agents. It ingests data in any format and builds a self-hosted knowledge graph, giving agents persistent long-term memory across sessions.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Cognee</title>
+  - method: GET
+    path: /docs
+    body_regex: (?is)^(?=.*Cognee\ API)(?=.*FastAPI)
+  - method: GET
+    path: /health
+    body_regex: (?is)^(?=.*"status":"ready")(?=.*"health":)(?=.*"version":)
+version:
+  method: GET
+  path: /health
+  body_regex: '"version":\s*"(\d+\.+\d+\.?\d*[^"]*)"'

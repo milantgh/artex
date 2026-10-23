@@ -1,0 +1,11 @@
+id: GHSA-qw99-grcx-4pvm
+title: OpenClaw Chrome 扩展中继因通配符被视为回环而公开绑定
+component: openclaw
+severity: MEDIUM
+affected: '>=2026.1.14-1,<2026.2.12'
+description: "概述\nChrome 扩展中继（ensureChromeExtensionRelayServer）此前将通配符主机（0.0.0.0 / ::）视为回环，当传递通配符 cdpUrl 时可能使中继 HTTP/WS 服务器绑定到所有接口。\n\n影响\n如果配置了通配符 cdpUrl，中继 HTTP 端点可能变为主机外可达，泄露服务存在/端口并允许对中继令牌头进行 DoS/暴力破解流量。\n\n受影响的包/版本\n- 包：openclaw (npm)\n- 受影响：>= 2026.1.14-1 < 2026.2.12\n\n修复版本\n- 修复：>= 2026.2.12（2026-02-13 发布）\n\n说明\n- /json* 认证和 /cdp 令牌检查的早期加固已在以下提交中实施：\n  - a1e89afcc19efd641c02b24d66d689f181ae2b5c\n\n感谢 @qi-scape 报告此问题。"
+references:
+- https://github.com/openclaw/openclaw/security/advisories/GHSA-qw99-grcx-4pvm
+remediation: 升级 openclaw 到 >=2026.2.12 或更高版本。提交 - 8d75a496bf5aaab1755c56cf48502d967c75a1d0
+check:
+  mode: version

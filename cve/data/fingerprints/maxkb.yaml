@@ -1,0 +1,9 @@
+id: maxkb
+name: maxkb
+category: ai-infra
+description: MaxKB (Max Knowledge Brain) is an open-source enterprise AI agent platform supporting RAG knowledge base Q&A, workflow orchestration, and private deployment.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>MaxKB</title>

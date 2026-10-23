@@ -1,0 +1,9 @@
+id: triton-inference-server
+name: triton-inference-server
+category: ai-infra
+description: Triton 推理服务器提供优化的云和边缘推理解决方案。
+match:
+  any:
+  - method: GET
+    path: /v2
+    body_regex: (?is)^(?=.*"name":"triton")(?=.*"extensions")

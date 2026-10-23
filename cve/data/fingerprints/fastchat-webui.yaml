@@ -1,0 +1,8 @@
+id: fastchat-webui
+name: fastchat-webui
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)"title":"Chat\ with\ Open\ Large\ Language\ Models"

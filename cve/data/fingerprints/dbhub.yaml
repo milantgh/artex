@@ -1,0 +1,9 @@
+id: dbhub
+name: DBHub
+category: ai-infra
+description: DBHub (bytebase/dbhub) is a token-conscious database MCP server for Postgres, MySQL, SQL Server, Oracle, MariaDB and SQLite. When started with HTTP transport (e.g. --transport http --port 8080), it runs an Express server that serves an unauthenticated workbench web UI and the MCP endpoint at /mcp (plus /healthz and /api/sources REST endpoints).
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>DBHub\ \-\ Minimal\ Database\ MCP\ Server</title>

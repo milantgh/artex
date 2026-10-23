@@ -1,0 +1,12 @@
+id: mcp-documentation-server
+name: mcp-documentation-server
+category: ai-infra
+description: MCP Documentation Server is a TypeScript-based MCP server providing local-first document management and AI-powered semantic search. It exposes an unauthenticated Web UI/API on port 3080.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>MCP\ Documentation\ Server</title>
+  - method: GET
+    path: /api/config
+    body_regex: (?is)^(?=.*"gemini_available")(?=.*"embedding_model")

@@ -1,0 +1,9 @@
+id: quivr
+name: quivr
+category: ai-infra
+description: Quivr - Open-source RAG platform for building AI assistants with brain-based knowledge management.
+match:
+  any:
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)^(?=.*/brains/)(?=.*/knowledge/)(?=.*/chat/)

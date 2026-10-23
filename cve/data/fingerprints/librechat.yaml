@@ -1,0 +1,16 @@
+id: librechat
+name: librechat
+category: ai-infra
+description: LibreChat is an open-source AI chat platform supporting multiple AI providers, with customizable UI and multi-user support.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>LibreChat</title>
+  - method: GET
+    path: /api/config
+    body_regex: (?is)librechat\.ai
+version:
+  method: GET
+  path: /api/version
+  body_regex: '"version"\s*:\s*"(\d+\.\d+\.?\d*?)"'

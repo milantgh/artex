@@ -1,0 +1,8 @@
+id: feast
+name: feast
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*/feast\-favicon\-300x300\.png)(?=.*<title>Feast\ Feature\ Store</title>)

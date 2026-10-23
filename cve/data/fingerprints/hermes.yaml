@@ -1,0 +1,15 @@
+id: hermes
+name: hermes
+category: ai-infra
+description: Hermes WebUI 是 Hermes Agent 的轻量级 Web 界面，提供浏览器中与 AI Agent 交互的能力。
+match:
+  any:
+  - method: GET
+    path: /
+    header_regex:
+      '*': (?is)HermesWebUI
+version:
+  method: GET
+  path: /health
+  header_regex:
+    '*': HermesWebUI/(\d+\.\d+\.\d+)

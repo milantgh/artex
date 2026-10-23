@@ -1,0 +1,9 @@
+id: f5-tts
+name: f5-tts
+category: ai-infra
+description: F5-TTS is a zero-shot text-to-speech system based on flow matching. It provides a Gradio web interface (default port 7860) with tabs for Basic-TTS, Multi-Speech, Voice-Chat, and Credits.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*Basic\-TTS)(?=.*Multi\-Speech)

@@ -1,0 +1,16 @@
+id: gradio
+name: gradio
+category: ai-infra
+description: 一个开源Python库，用于创建共享和交互机器学习模型的网页界面。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<script>window\.gradio_config\ =\ \{
+  - method: GET
+    path: /
+    body_regex: (?is)document\.getElementsByTagName\("gradio\-app"\);
+version:
+  method: GET
+  path: /
+  body_regex: window.gradio_config = {"version":"(\d+\.\d+\.?\d+?)"

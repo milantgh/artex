@@ -1,0 +1,12 @@
+id: qanything
+name: qanything
+category: ai-infra
+description: 网易有道开发的开源企业级本地知识库问答系统，支持多种数据格式和数据库的本地查询。
+match:
+  any:
+  - method: GET
+    path: /qanything
+    body_regex: (?is)<title>QAnything</title>
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Application\ QAnything\ cannot\ handle\ your\ request</title>

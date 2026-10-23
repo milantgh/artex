@@ -1,0 +1,15 @@
+id: anythingllm
+name: anythingllm
+category: ai-infra
+description: 用于使用任何大语言模型（LLM）与文档对话的AI应用，确保隐私和易用性。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>AnythingLLM\ \|\ Your\ personal\ LLM\ trained\ on\ anything</title>
+  - method: GET
+    path: /api/setup-complete
+    body_regex: (?is)AnythingLLMOllamaModelPref
+  - method: GET
+    path: /api/setup-complete
+    body_regex: (?is)"PGVectorTableName":"anythingllm_vectors"

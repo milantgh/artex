@@ -1,0 +1,12 @@
+id: koboldcpp
+name: koboldcpp
+category: ai-infra
+description: KoboldCpp - Easy-to-use AI text-generation software for GGML/GGUF models.
+match:
+  any:
+  - method: GET
+    path: /api/extra/version
+    body_regex: (?is)"result":\ "KoboldCpp"
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":\ "koboldcpp"

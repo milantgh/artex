@@ -1,0 +1,11 @@
+id: omniroute
+name: omniroute
+category: ai-infra
+description: OmniRoute - AI gateway for multi-provider LLMs with smart routing, load balancing, caching, and observability.
+match:
+  any:
+  - method: GET
+    path: /api/cache
+    body_regex: (?is)semanticCache
+    header_regex:
+      '*': (?is)X\-OmniRoute\-Cache

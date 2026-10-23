@@ -1,0 +1,13 @@
+id: lmdeploy
+name: lmdeploy
+category: ai-infra
+description: LMDeploy is an open-source toolkit by InternLM (OpenMMLab) for compressing, deploying, and serving large language models (LLMs). It exposes an OpenAI-compatible REST API server (FastAPI) with Swagger documentation at /docs. The service binds to 0.0.0.0 by default with API keys disabled.
+match:
+  any:
+  - method: GET
+    path: /docs
+    body_regex: (?is)LMDeploy\ API\ Server\ \-\ Swagger\ UI
+version:
+  method: GET
+  path: /openapi.json
+  body_regex: '"version"\s*:\s*"([0-9]+\.[0-9]+\.[0-9]+)"'

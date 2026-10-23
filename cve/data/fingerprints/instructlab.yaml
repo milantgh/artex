@@ -1,0 +1,9 @@
+id: instructlab
+name: instructlab
+category: ai-infra
+description: InstructLab is an open source AI project by IBM Red Hat that facilitates contributions to Large Language Models (LLMs). It provides a CLI and an OpenAI-compatible HTTP inference server via `ilab model serve`.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)Hello\ from\ InstructLab!\ Visit\ us\ at\ https://instructlab\.ai

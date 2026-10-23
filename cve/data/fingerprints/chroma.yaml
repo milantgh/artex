@@ -1,0 +1,19 @@
+id: chroma
+name: chroma
+category: ai-infra
+description: Chroma is an open-source embedding database for building AI applications with retrieval.
+match:
+  any:
+  - method: GET
+    path: /api/v2/heartbeat
+    body_regex: (?is)nanosecond\ heartbeat
+  - method: GET
+    path: /api/v1/heartbeat
+    body_regex: (?is)nanosecond\ heartbeat
+version:
+- method: GET
+  path: /api/v2/version
+  body_regex: '"(\d+\.\d+\.?\d+?)"'
+- method: GET
+  path: /api/v1/version
+  body_regex: '"(\d+\.\d+\.?\d+?)"'

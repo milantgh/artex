@@ -1,0 +1,10 @@
+id: mcp-atlassian
+name: mcp-atlassian
+category: ai-infra
+description: MCP Atlassian (mcp-atlassian, by sooperset) is a Model Context Protocol (MCP) server for Atlassian products (Confluence and Jira) built with FastMCP. In HTTP transports (--transport streamable-http at /mcp, --transport sse at /sse and /messages/) the JSON-RPC initialize response serverInfo.name is "Atlassian MCP". A GET /healthz endpoint returns {"status":"ok"}.
+match:
+  any:
+  - method: POST
+    path: /mcp
+    body_regex: (?is)^(?=.*Atlassian\ MCP)(?=.*serverInfo)
+    body: '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"probe","version":"1.0"},"meta":{}},"id":1}'

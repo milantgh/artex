@@ -1,0 +1,11 @@
+id: clawdbot-gateway
+name: Clawdbot Gateway
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Clawdbot\ Control</title>
+  - method: GET
+    path: /
+    body_regex: (?is)<clawdbot\-app></clawdbot\-app>

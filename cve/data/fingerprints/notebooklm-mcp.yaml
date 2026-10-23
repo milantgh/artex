@@ -1,0 +1,13 @@
+id: notebooklm-mcp
+name: NotebookLM MCP
+category: ai-infra
+description: NotebookLM MCP (roomi-fields/notebooklm-mcp) is an MCP server and HTTP service for interacting with Google NotebookLM and exporting generated content to local vault directories. The Express HTTP wrapper binds 0.0.0.0:3000 by default (HTTP_HOST env override) and Docker deployments map port 3000. An unauthenticated GET / returns {"name":"NotebookLM MCP HTTP Server","version":"..."}.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)NotebookLM\ MCP\ HTTP\ Server
+version:
+  method: GET
+  path: /
+  body_regex: '"version"\s*:\s*"([0-9][0-9a-zA-Z.\-]*)"'

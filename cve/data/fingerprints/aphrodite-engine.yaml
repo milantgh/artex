@@ -1,0 +1,9 @@
+id: aphrodite-engine
+name: aphrodite-engine
+category: ai-infra
+description: Aphrodite Engine - Large-scale LLM inference engine with OpenAI-compatible API, forked from vLLM.
+match:
+  any:
+  - method: GET
+    path: /.well-known/serviceinfo
+    body_regex: (?is)^(?=.*"Aphrodite\ Engine")(?=.*"software")

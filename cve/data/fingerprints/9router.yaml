@@ -1,0 +1,12 @@
+id: 9router
+name: 9router
+category: ai-infra
+description: 9Router is an open-source AI routing gateway (Next.js) that connects AI coding tools (Claude Code, Codex, Cursor, Cline, etc.) to 40+ AI providers. It exposes a web dashboard and an OpenAI-compatible API endpoint on port 20128 by default.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>9Router
+  - method: GET
+    path: /dashboard
+    body_regex: (?is)<title>9Router

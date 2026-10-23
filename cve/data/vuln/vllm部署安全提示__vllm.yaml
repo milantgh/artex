@@ -1,0 +1,9 @@
+id: vllm部署安全提示
+title: vllm外部开放将导致算力窃取和数据资源滥用
+component: vllm
+severity: LOW
+affected: '*'
+description: vllm外部开放将导致算力窃取和数据资源滥用
+remediation: vllm建议仅在本地开放
+check:
+  mode: version

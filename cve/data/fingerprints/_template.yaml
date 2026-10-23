@@ -1,0 +1,30 @@
+# ============================================================
+# 组件指纹模板 —— 复制本文件，改名为 <组件id>.yaml 即可生效
+# 注意：文件名不要以 "_" 开头（"_" 开头的文件会被扫描器忽略）
+# ============================================================
+id: example-component            # 必填，唯一英文小写 id（供 data/vuln/ 的 component 字段引用）
+name: Example Component          # 必填，展示名
+vendor: Example Inc.             # 可选
+category: llm-serving            # 可选：llm-serving / ai-app / agent / workflow / vector-db ...
+description: "组件一句话说明"
+
+# match.any —— 命中任意一条，即认为识别到该组件
+match:
+  any:
+    - method: GET                # 可选，默认 GET
+      path: /api/version         # 相对 target 的路径
+      status: 200                # 可选；可为 int 或列表，如 [200, 401]
+      body_contains: "Example"   # 响应体包含该字符串
+      body_regex: '"version"\s*:\s*"([0-9.]+)"'   # 响应体正则
+      header_contains:           # 响应头包含
+        Server: Example
+      header_regex:              # 响应头正则
+        X-Powered-By: "Example/([0-9.]+)"
+
+# version —— 可选：从响应中提取版本号，供 vuln 规则的 affected 区间使用
+# 若版本不在识别用的那个接口上，用 path 指定一个独立的版本探测请求
+version:
+  path: /api/version            # 可选：独立的版本探测路径
+  body_regex: "Example v?([0-9.]+)"
+  header_regex:
+    Server: "Example/([0-9.]+)"

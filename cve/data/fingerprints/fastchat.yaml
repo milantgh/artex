@@ -1,0 +1,9 @@
+id: fastchat
+name: fastchat
+category: ai-infra
+description: 一个开源平台，用于训练、服务和评估大语言模型。
+match:
+  any:
+  - method: POST
+    path: /worker_get_status
+    body_regex: (?is)model_names

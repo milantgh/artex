@@ -1,0 +1,15 @@
+id: vllm
+name: vLLM
+category: llm-serving
+description: "vLLM 高性能 LLM 推理服务"
+match:
+  any:
+    - path: /metrics
+      status: 200
+      body_contains: "vllm:"
+    - path: /version
+      status: 200
+      body_regex: '"version"\s*:'
+version:
+  header_regex:
+    Server: "vllm/([0-9.]+)"

@@ -1,0 +1,9 @@
+id: ollama部署安全提示
+title: ollama外部开放将导致算力窃取和数据资源滥用
+component: ollama
+severity: LOW
+affected: '*'
+description: ollama外部开放将导致算力窃取和数据资源滥用
+remediation: ollama建议仅在本地开放
+check:
+  mode: version

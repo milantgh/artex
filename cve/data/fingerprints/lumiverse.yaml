@@ -1,0 +1,9 @@
+id: lumiverse
+name: Lumiverse
+category: ai-infra
+description: Lumiverse is a self-hosted, full-featured AI chat application built in TypeScript/Bun. It supports roleplay, storytelling, and multi-provider LLM conversations with an MCP extension runtime.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Lumiverse</title>

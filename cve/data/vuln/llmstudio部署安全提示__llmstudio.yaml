@@ -1,0 +1,9 @@
+id: llmstudio部署安全提示
+title: llmstudio外部开放将导致算力窃取和数据资源滥用
+component: llmstudio
+severity: LOW
+affected: '*'
+description: llmstudio外部开放将导致算力窃取和数据资源滥用
+remediation: llmstudio对外api建议仅在本地开放
+check:
+  mode: version

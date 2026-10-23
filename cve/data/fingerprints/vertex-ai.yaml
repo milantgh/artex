@@ -1,0 +1,9 @@
+id: vertex-ai
+name: vertex-ai
+category: ai-infra
+description: Google Vertex AI - ML training and generative AI platform (aiplatform.googleapis.com).
+match:
+  any:
+  - method: GET
+    path: /$discovery/rest?version=v1
+    body_regex: (?is)^(?=.*"name":\ "aiplatform")(?=.*"title":\ "Vertex\ AI\ API")

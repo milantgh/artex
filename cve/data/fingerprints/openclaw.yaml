@@ -1,0 +1,22 @@
+id: openclaw
+name: OpenClaw
+category: ai-infra
+description: OpenClaw is a personal AI assistant platform with tool-use, skill management, and gateway service.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<openclaw\-app>
+  - method: GET
+    path: /
+    body_regex: (?is)<title>OpenClaw\ Control</title>
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Clawdbot\ Control</title>
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Moltbot\ Control</title>
+version:
+  method: GET
+  path: /__openclaw/control-ui-config.json
+  body_regex: '"serverVersion":\s?"([\d.]+[^"]*)"'

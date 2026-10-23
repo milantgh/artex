@@ -1,0 +1,14 @@
+id: pinchtab
+name: pinchtab
+category: ai-infra
+description: PinchTab is a standalone HTTP server that gives AI agents direct control over a Chrome browser via a REST API and built-in web dashboard.
+match:
+  any:
+  - method: GET
+    path: /instances
+    header_regex:
+      '*': (?is)WWW\-Authenticate:\ Bearer\ realm="pinchtab"
+version:
+  method: GET
+  path: /health
+  body_regex: '"version":"([^"]+)"'

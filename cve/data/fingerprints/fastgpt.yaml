@@ -1,0 +1,9 @@
+id: fastgpt
+name: fastgpt
+category: ai-infra
+description: FastGPT is an open-source AI Agent building platform based on LLMs, offering knowledge base Q&A, visual workflow orchestration, and RAG capabilities.
+match:
+  any:
+  - method: GET
+    path: /login
+    body_regex: (?is)<title>FastGPT</title>

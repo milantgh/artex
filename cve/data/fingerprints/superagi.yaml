@@ -1,0 +1,9 @@
+id: superagi
+name: superagi
+category: ai-infra
+description: SuperAGI is an open-source autonomous AI agent framework that enables developers to build, manage, and run useful autonomous AI agents with a graphical web interface.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*<title>SuperAGI</title>)(?=.*/_next/)

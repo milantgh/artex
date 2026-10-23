@@ -1,0 +1,9 @@
+id: ray部署安全提示
+title: ray未授权外部开放将导致外部漏洞利用
+component: ray
+severity: HIGH
+affected: '*'
+description: ray未授权外部开放将导致外部漏洞利用
+remediation: ray建议仅在本地开放
+check:
+  mode: version

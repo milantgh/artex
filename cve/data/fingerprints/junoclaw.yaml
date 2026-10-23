@@ -1,0 +1,16 @@
+id: junoclaw
+name: junoclaw
+category: ai-infra
+description: JunoClaw is an open-source agentic AI platform built on Juno Network, providing LLM-powered agent runtimes, CosmWasm smart contract integration, and an Axum HTTP/WebSocket daemon with a React dashboard.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>JunoClaw</title>
+  - method: GET
+    path: /api/health
+    body_regex: (?is)junoclaw\-daemon
+version:
+  method: GET
+  path: /api/health
+  body_regex: '"version"\s*:\s*"([^"]+)"'

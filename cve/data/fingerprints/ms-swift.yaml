@@ -1,0 +1,9 @@
+id: ms-swift
+name: ms-swift
+category: ai-infra
+description: ms-swift is a large model and multimodal large model fine-tuning and deployment framework by ModelScope. The swift deploy command starts an OpenAI-compatible API server backed by vLLM/SGLang/LMDeploy.
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":"swift"

@@ -1,0 +1,12 @@
+id: lightllm
+name: lightllm
+category: ai-infra
+description: LightLLM 是一个基于 Python 的高性能大语言模型推理与服务框架，由 ModelTC 开发，支持多 GPU 推理加速。
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":"lightllm"
+  - method: GET
+    path: /token_load
+    body_regex: (?is)^(?=.*"logical_max_load")(?=.*"dynamic_max_load")

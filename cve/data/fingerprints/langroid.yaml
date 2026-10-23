@@ -1,0 +1,15 @@
+id: langroid
+name: langroid
+category: ai-infra
+description: Langroid is an intuitive, lightweight, extensible Python framework for building LLM-powered applications using a multi-agent programming paradigm, from ex-CMU and UW-Madison researchers.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*Langroid\ Chat\ API)(?=.*langroid)
+  - method: GET
+    path: /health
+    body_regex: (?is)^(?=.*langroid)(?=.*healthy)
+  - method: GET
+    path: /docs
+    body_regex: (?is)Langroid\ Chat\ UI\ Backend

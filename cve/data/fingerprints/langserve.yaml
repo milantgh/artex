@@ -1,0 +1,9 @@
+id: langserve
+name: langserve
+category: ai-infra
+description: LangChain's official LLM application deployment tool, built on FastAPI to expose chains and agents as REST APIs with a built-in interactive Playground UI.
+match:
+  any:
+  - method: GET
+    path: /playground/index.html
+    body_regex: (?is)____LANGSERVE_BASE_URL

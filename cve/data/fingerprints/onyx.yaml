@@ -1,0 +1,12 @@
+id: onyx
+name: onyx
+category: ai-infra
+description: Onyx - Open-source AI platform for enterprise search and chat with RAG capabilities.
+match:
+  any:
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)"title":"Onyx\ Backend"
+  - method: GET
+    path: /api/docs
+    body_regex: (?is)<title>Onyx\ Backend\ \-\ Swagger\ UI</title>

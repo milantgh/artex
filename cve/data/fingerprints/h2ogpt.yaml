@@ -1,0 +1,12 @@
+id: h2ogpt
+name: h2ogpt
+category: ai-infra
+description: h2oGPT - Private local GPT with document Q&A by H2O.ai, built on Gradio.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*h2oGPT)(?=.*submit_nochat_api)
+  - method: GET
+    path: /info
+    body_regex: (?is)submit_nochat_api

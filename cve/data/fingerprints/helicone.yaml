@@ -1,0 +1,12 @@
+id: helicone
+name: helicone
+category: ai-infra
+description: Helicone - Open-source LLM observability platform and AI gateway.
+match:
+  any:
+  - method: GET
+    path: /healthcheck
+    body_regex: (?is)"healthy\ :\)"
+  - method: GET
+    path: /download/swagger.json
+    body_regex: (?is)Helicone

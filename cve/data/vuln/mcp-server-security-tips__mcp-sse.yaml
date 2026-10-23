@@ -1,0 +1,15 @@
+id: mcp server security tips
+title: mcp server需注意鉴权和接口滥用风险
+component: mcp-sse
+severity: LOW
+affected: '*'
+description: 'mcp server需注意鉴权和接口滥用风险。
+
+  需要确保服务器配置正确，以防止未经授权的访问和接口滥用。'
+remediation: '1. 建议仅在本地开放mcp server。
+
+  2. 实施严格的鉴权机制。
+
+  3. 定期检查和更新服务器配置以防范潜在风险。'
+check:
+  mode: version

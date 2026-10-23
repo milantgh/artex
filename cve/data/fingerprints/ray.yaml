@@ -1,0 +1,16 @@
+id: ray
+name: ray
+category: ai-infra
+description: 一个开源框架，用于扩展AI和Python应用，提供分布式计算和机器学习工作负载的统一方式。
+match:
+  any:
+  - method: GET
+    path: /api/cluster_status
+    body_regex: (?is)Got\ cluster\ status
+  - method: GET
+    path: /api/serve/applications/
+    body_regex: (?is)^(?=.*"controller_info")(?=.*"proxy_location")(?=.*SERVE_CONTROLLER_ACTOR)
+version:
+  method: GET
+  path: /api/version
+  body_regex: '"ray_version":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'

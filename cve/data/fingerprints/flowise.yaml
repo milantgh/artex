@@ -1,0 +1,19 @@
+id: flowise
+name: flowise
+category: ai-infra
+description: Flowise is an open-source low-code platform for building AI agents and LLM-powered chatflows with a visual drag-and-drop interface.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Flowise</title>
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*flowiseai\.com)(?=.*FlowiseAI)
+  - method: GET
+    path: /api/v1/chatflows
+    body_regex: (?is)"Unauthorized\ Access"
+version:
+  method: GET
+  path: /api/v1/version
+  body_regex: '"version"\s*:\s*"(\d+\.\d+\.?\d*?)"'

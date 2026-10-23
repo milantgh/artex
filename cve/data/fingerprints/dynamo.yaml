@@ -1,0 +1,16 @@
+id: dynamo
+name: Dynamo
+category: ai-infra
+description: NVIDIA Dynamo is an open-source, datacenter-scale distributed LLM inference serving framework (Rust+Python) with an OpenAI-compatible HTTP API served by the Dynamo frontend on the default port 8787.
+match:
+  any:
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)^(?=.*NVIDIA\ Dynamo\ OpenAI\ Frontend)(?=.*OpenAI\-compatible\ HTTP\ API\ for\ NVIDIA\ Dynamo)
+  - method: GET
+    path: /metrics
+    body_regex: (?is)dynamo_frontend_
+version:
+  method: GET
+  path: /openapi.json
+  body_regex: '"version"\s*:\s*"([0-9]+\.[0-9]+\.[0-9]+)"'

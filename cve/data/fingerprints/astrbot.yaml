@@ -1,0 +1,9 @@
+id: astrbot
+name: astrbot
+category: ai-infra
+description: AstrBot - Multi-platform LLM chatbot framework with dashboard and plugin system.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*<title>AstrBot)(?=.*AstrBot\ Dashboard)

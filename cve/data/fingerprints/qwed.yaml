@@ -1,0 +1,19 @@
+id: qwed
+name: qwed
+category: ai-infra
+description: QWED is open-source AI verification infrastructure for deterministic verification of LLM outputs, tool calls, code, schemas, and agent state before production execution.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)QWED\ OS\ is\ Running
+  - method: GET
+    path: /docs
+    body_regex: (?is)^(?=.*QWED\ API)(?=.*Deterministic\ Verification\ Protocol)
+  - method: GET
+    path: /health
+    body_regex: (?is)^(?=.*"service":"QWED\ Platform")(?=.*"status":"healthy")
+version:
+  method: GET
+  path: /health
+  body_regex: '"version":\s*"(\d+\.+\d+\.?\d*[^"]*)"'

@@ -1,0 +1,9 @@
+id: fireworks-ai
+name: fireworks-ai
+category: ai-infra
+description: Fireworks AI - Cloud inference platform for LLMs with OpenAI-compatible API.
+match:
+  any:
+  - method: GET
+    path: /inference/v1/models
+    body_regex: (?is)accounts/fireworks/models/

@@ -1,0 +1,11 @@
+id: GHSA-hv93-r4j3-q65f
+title: OpenClaw Hook 会话密钥覆盖实现定向跨会话路由
+component: openclaw
+severity: HIGH
+affected: <2026.2.12
+description: "概述\n问题本身不在于确定性会话密钥。可利用的路径是在经过认证的 Hook 入口上接受外部提供的 sessionKey 值，允许 Hook 令牌持有者将消息路由到指定的会话。\n\n受影响的行为\n- POST /hooks/agent 接受有效载荷中的 sessionKey 并直接用于会话路由。\n- 常见的会话密钥格式（例如 agent:main:dm:<peerId>）通常可从已知元数据推导，当启用请求级别覆盖时，定向路由变得可行。\n\n攻击前提条件\n- 攻击者能够使用有效的 Hook 令牌调用 Hook 端点。\n- Hook 入口允许请求指定 sessionKey 值。\n- 目标会话密钥可被推导或猜测。\n\n若不满足上述前提条件，仅凭确定性密钥格式本身不能提供访问权限。\n\n影响\n- 完整性：向指定会话进行定向消息/提示注入。\n- 持久性：在相同会话密钥被重用时，被污染的上下文可影响后续对话轮次。\n- 机密性影响是次要的，取决于其他额外弱点。\n\n受影响版本\n- openclaw >= 2.0.0-beta3 且 < 2026.2.12\n\n修复版本\n- openclaw >= 2026.2.12\n\n修复\nOpenClaw 现在对 Hook 会话路由使用安全默认值：\n- POST /hooks/agent 拒绝有效载荷中的 sessionKey，除非设置 hooks.allowRequestSessionKey=true。\n- 添加了 hooks.defaultSessionKey 用于固定入口路由。\n- 添加了 hooks.allowedSessionKeyPrefixes 以约束显式路由密钥。\n- 安全审计对不安全的 Hook 会话路由设置发出警告。\n\n推荐配置\n``json\n{\n  \"hooks\": {\n    \"enabled\": true,\n    \"token\": \"${OPENCLAW_HOOKS_TOKEN}\",\n    \"defaultSessionKey\": \"hook:ingress\",\n    \"allowRequestSessionKey\": false,\n    \"allowedSessionKeyPrefixes\": [\"hook:\"]\n  }\n}\n``\n\n致谢\n感谢 @alpernae 进行负责任的漏洞报告。"
+references:
+- https://github.com/openclaw/openclaw/security/advisories/GHSA-hv93-r4j3-q65f
+remediation: 升级 openclaw 到 >= 2026.2.12 或更高版本。OpenClaw 现在对 Hook 会话路由使用安全默认值：- POST /hooks/agent 拒绝有效载荷中的 sessionKey，除非设置 hooks.allowRequestSessionKey=true。- 添加了 hooks.defaultSessionKey 用于固定入口路由。
+check:
+  mode: version

@@ -1,0 +1,9 @@
+id: modal
+name: modal
+category: ai-infra
+description: Modal - Serverless AI platform for LLM serving via vLLM/FastAPI.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)modal\-http:\ invalid\ function\ call

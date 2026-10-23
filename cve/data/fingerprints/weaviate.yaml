@@ -1,0 +1,13 @@
+id: weaviate
+name: weaviate
+category: ai-infra
+description: Weaviate is an open-source vector database with semantic search and generative AI modules.
+match:
+  any:
+  - method: GET
+    path: /v1/meta
+    body_regex: (?is)^(?=.*"hostname")(?=.*"version")(?=.*"modules")
+version:
+  method: GET
+  path: /v1/meta
+  body_regex: '"version":"(\d+\.\d+\.?\d+?)"'

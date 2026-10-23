@@ -1,0 +1,13 @@
+id: kubepi
+name: KubePi
+category: ai-infra
+description: 一个CLI工具，简化在Raspberry Pi设备上设置和管理Kubeflow的环境。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>KubePi</title>
+version:
+  method: GET
+  path: /
+  body_regex: version.*?v(\d+\.\d+\.\d+)

@@ -1,0 +1,13 @@
+id: context7
+name: Context7
+category: ai-infra
+description: Context7 is an MCP server (by Upstash) that provides up-to-date documentation and code examples for libraries/frameworks directly into LLM contexts. Supports both stdio and HTTP transports (default HTTP port 3000).
+match:
+  any:
+  - method: GET
+    path: /.well-known/oauth-protected-resource
+    body_regex: (?is)^(?=.*mcp\.context7\.com)(?=.*authorization_servers)
+  - method: GET
+    path: /mcp
+    header_regex:
+      '*': (?is)^(?=.*resource_metadata)(?=.*context7\.com)

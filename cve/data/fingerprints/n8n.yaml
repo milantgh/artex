@@ -1,0 +1,8 @@
+id: n8n
+name: n8n
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>n8n\.io\ \-\ Workflow\ Automation</title>

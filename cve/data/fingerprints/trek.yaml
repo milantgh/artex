@@ -1,0 +1,9 @@
+id: trek
+name: TREK
+category: ai-infra
+description: TREK is an open-source, self-hosted real-time collaborative travel planner (maps, budgets, packing lists, journal, AI-assisted import) by liketrek. Ships as Docker image mauriceboe/trek, listens on port 3000, serves a React SPA with the NestJS API under /api.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*<title>TREK</title>)(?=.*theme\-boot\.js)

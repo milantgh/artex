@@ -1,0 +1,9 @@
+id: jupyterlab
+name: jupyterlab
+category: ai-infra
+description: 一个基于网页的交互式开发环境，支持创建和共享包含笔记本、代码和数据的计算文档。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>JupyterLab</title>

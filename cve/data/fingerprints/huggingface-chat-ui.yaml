@@ -1,0 +1,9 @@
+id: huggingface-chat-ui
+name: huggingface-chat-ui
+category: ai-infra
+description: HuggingFace Chat UI - Open-source ChatGPT-style interface powering HuggingChat.
+match:
+  any:
+  - method: GET
+    path: /api/v2/public-config
+    body_regex: (?is)^(?=.*"PUBLIC_APP_NAME":"ChatUI")(?=.*"PUBLIC_APP_ASSETS")

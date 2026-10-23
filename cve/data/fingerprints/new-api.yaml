@@ -1,0 +1,17 @@
+id: new-api
+name: new-api
+category: ai-infra
+description: 'New API is a unified AI model hub and LLM gateway supporting aggregation and distribution of
+
+  100+ LLM providers. It converts various LLMs into OpenAI/Claude/Gemini compatible formats
+
+  and provides centralized model management for personal and enterprise use.'
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*<title>New\ API</title>)(?=.*content="new\-api")
+version:
+  method: GET
+  path: /api/status
+  body_regex: '"version"\s*:\s*"(v[0-9]+\.[0-9]+\.[0-9]+[^"]*)"'

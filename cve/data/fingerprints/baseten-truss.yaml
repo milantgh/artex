@@ -1,0 +1,9 @@
+id: baseten-truss
+name: baseten-truss
+category: ai-infra
+description: Baseten Truss - Open-source ML model serving framework with OpenAPI spec.
+match:
+  any:
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)Baseten\ Inference\ Server

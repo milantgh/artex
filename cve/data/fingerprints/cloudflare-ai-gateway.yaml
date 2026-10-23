@@ -1,0 +1,10 @@
+id: cloudflare-ai-gateway
+name: cloudflare-ai-gateway
+category: ai-infra
+description: Cloudflare AI Gateway - Cloud proxy for multiple AI providers with caching, rate limiting, and observability.
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    header_regex:
+      '*': (?is)cf\-aig\-event\-id

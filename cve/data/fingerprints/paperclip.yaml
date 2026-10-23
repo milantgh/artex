@@ -1,0 +1,12 @@
+id: paperclip
+name: paperclip
+category: ai-infra
+description: Paperclip is a Node.js server and React UI that orchestrates a team of AI agents to run a business. It provides org charts, agent coordination, budgets, and governance for autonomous AI companies.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*<title>Paperclip</title>)(?=.*PAPERCLIP_FAVICON_START)
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*<title>Paperclip</title>)(?=.*paperclip\-startup\-title)

@@ -1,0 +1,9 @@
+id: Clawdbot Gateway部署安全提示
+title: Clawdbot Gateway外部开放将导致算力窃取和数据资源滥用
+component: clawdbot-gateway
+severity: LOW
+affected: '*'
+description: Clawdbot Gateway外部开放将导致算力窃取和数据资源滥用
+remediation: Clawdbot Gateway建议仅在本地开放
+check:
+  mode: version

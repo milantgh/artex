@@ -1,0 +1,13 @@
+id: llama-cpp
+name: llama-cpp
+category: ai-infra
+description: 基于 C++ 的 LLaMA 模型推理引擎，支持本地高效运行 LLaMA 系列模型。
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":"llamacpp"
+  - method: GET
+    path: /health
+    header_regex:
+      '*': (?is)llama\.cpp

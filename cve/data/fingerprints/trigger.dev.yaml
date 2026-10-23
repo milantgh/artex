@@ -1,0 +1,13 @@
+id: trigger.dev
+name: Trigger.dev
+category: ai-infra
+description: A platform for building and deploying fully managed AI agents and workflows with background job execution.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)Login\ to\ Trigger\.dev
+  - method: GET
+    path: /
+    header_regex:
+      '*': (?is)^(?=.*__message)(?=.*__redirectTo)

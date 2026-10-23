@@ -1,0 +1,23 @@
+id: dify
+name: dify
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Dify</title>
+  - method: GET
+    path: /
+    body_regex: (?is)content="Dify
+  - method: GET
+    path: /apps
+    body_regex: (?is)^(?=.*<title>Dify</title>)(?=.*data\-public\-edition)
+version:
+- method: GET
+  path: /health
+  header_regex:
+    '*': x-version:\s*(\d+\.\d+\.?\d*)
+- method: GET
+  path: /console/api/version
+  header_regex:
+    '*': x-version:\s*(\d+\.\d+\.?\d*)

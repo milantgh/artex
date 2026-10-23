@@ -1,0 +1,9 @@
+id: tabbyapi
+name: tabbyapi
+category: ai-infra
+description: TabbyAPI - FastAPI-based LLM server for ExLlama with OpenAI-compatible API.
+match:
+  any:
+  - method: GET
+    path: /.well-known/serviceinfo
+    body_regex: (?is)^(?=.*"TabbyAPI")(?=.*"software")

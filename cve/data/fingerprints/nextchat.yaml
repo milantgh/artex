@@ -1,0 +1,14 @@
+id: nextchat
+name: nextchat
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>NextChat</title>
+  - method: GET
+    path: /site.webmanifest
+    body_regex: (?is)^(?=.*"name":\ "NextChat")(?=.*"short_name":\ "NextChat")
+  - method: GET
+    path: /api/config
+    body_regex: (?is)^(?=.*"needCode")(?=.*"hideUserApiKey")(?=.*"disableGPT4")

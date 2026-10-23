@@ -1,0 +1,13 @@
+id: agentic-flow
+name: Agentic-Flow
+category: ai-infra
+description: Agentic-Flow is a production-ready AI agent orchestration platform with specialized agents, MCP tools, and autonomous multi-agent swarms, exposing HTTP/SSE and health endpoints
+match:
+  any:
+  - method: GET
+    path: /health
+    body_regex: (?is)^(?=.*"checks":\ \{)(?=.*"api":\ \{)(?=.*"memory":\ \{)(?=.*"usage":)(?=.*"limit":)(?=.*"uptime":)
+version:
+  method: GET
+  path: /health
+  body_regex: '"version"\s*:\s*"([0-9][0-9.a-zA-Z\-]+)"'

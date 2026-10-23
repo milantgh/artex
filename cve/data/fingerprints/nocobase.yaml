@@ -1,0 +1,12 @@
+id: nocobase
+name: nocobase
+category: ai-infra
+description: NocoBase - Open-source AI + no-code platform for building business systems.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)__nocobase_api_base_url__
+  - method: GET
+    path: /api/app:getInfo
+    body_regex: (?is)^(?=.*"lang":)(?=.*"theme":)(?=.*"version":)(?=.*"database":)

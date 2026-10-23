@@ -1,0 +1,11 @@
+id: lobechat
+name: LobeChat
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>LobeChat</title>
+  - method: GET
+    path: /manifest.webmanifest
+    body_regex: (?is)^(?=.*"id":"lobe\-hub")(?=.*"name":"LobeHub")

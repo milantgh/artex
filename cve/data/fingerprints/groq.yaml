@@ -1,0 +1,15 @@
+id: groq
+name: groq
+category: ai-infra
+description: Groq Cloud LPU Inference API - Ultra-fast LLM inference with custom LPU hardware.
+match:
+  any:
+  - method: GET
+    path: /openai/v1/models
+    header_regex:
+      '*': (?is)x\-groq\-region
+  - method: GET
+    path: /
+    body_regex: (?is)Welcome\ to\ the\ Groq\ API
+    header_regex:
+      '*': (?is)x\-groq\-region

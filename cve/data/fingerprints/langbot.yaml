@@ -1,0 +1,13 @@
+id: langbot
+name: langbot
+category: ai-infra
+description: LangBot - Production-grade platform for building agentic IM bots
+match:
+  any:
+  - method: GET
+    path: /login
+    body_regex: (?is)^(?=.*<title>LangBot</title>)(?=.*Production\-grade\ platform\ for\ building\ agentic\ IM\ bots)
+version:
+  method: GET
+  path: /api/v1/system/info
+  body_regex: '"version"\s*:\s*"v?([0-9][0-9.]*)"'

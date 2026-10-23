@@ -1,0 +1,9 @@
+id: lollms
+name: lollms
+category: ai-infra
+description: LoLLMs (Lord of Large Language and Multimodal Systems) is an open-source web UI for running and managing LLMs locally. It provides a browser-based interface for chat, social features, and model management. Default port is 9600.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>LoLLMS\ WebUI</title>

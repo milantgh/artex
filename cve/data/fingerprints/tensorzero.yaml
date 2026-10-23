@@ -1,0 +1,9 @@
+id: tensorzero
+name: tensorzero
+category: ai-infra
+description: TensorZero Gateway - Open-source Rust-based LLM gateway with observability, optimization, and experimentation.
+match:
+  any:
+  - method: GET
+    path: /metrics
+    body_regex: (?is)tensorzero_inferences_total

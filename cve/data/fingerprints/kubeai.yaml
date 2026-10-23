@@ -1,0 +1,9 @@
+id: kubeai
+name: kubeai
+category: ai-infra
+description: KubeAI is an AI inference operator for Kubernetes, providing an OpenAI-compatible API to deploy and scale LLMs, embeddings, and speech-to-text models.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>KubeAI</title>

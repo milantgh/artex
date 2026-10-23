@@ -1,0 +1,16 @@
+id: mlflow
+name: mlflow
+category: ai-infra
+description: MLflow - Machine Learning lifecycle platform for experiment tracking, model management, and deployment.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>MLflow</title>
+  - method: GET
+    path: /
+    body_regex: (?is)mlflow\-ui\-container
+version:
+  method: GET
+  path: /version
+  body_regex: ^(\d+\.\d+\.\d+.*)$

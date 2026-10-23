@@ -1,0 +1,9 @@
+id: mem0
+name: mem0
+category: ai-infra
+description: 一个开源的 AI 记忆层服务，为 AI Agent 和应用提供记忆管理与搜索能力，支持自托管部署。
+match:
+  any:
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)Mem0\ REST\ APIs

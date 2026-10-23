@@ -1,0 +1,19 @@
+id: langflow
+name: langflow
+category: ai-infra
+description: Langflow is a powerful tool for building and deploying AI-powered agents and workflows.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Langflow</title>
+  - method: GET
+    path: /api/v1/version
+    body_regex: (?is)^(?=.*"package")(?=.*Langflow)
+  - method: GET
+    path: /health_check
+    body_regex: (?is)^(?=.*"status":")(?=.*"chat":")(?=.*"db":")
+version:
+  method: GET
+  path: /api/v1/version
+  body_regex: '"version":"(.*?)",'

@@ -1,0 +1,18 @@
+id: eclipse-theia
+name: Eclipse Theia
+category: ai-infra
+description: Eclipse Theia is a cloud & desktop IDE framework implemented in TypeScript, with AI Agent Mode support.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Eclipse\ Theia</title>
+  - method: GET
+    path: /
+    body_regex: (?is)theia\-preload
+  - method: GET
+    path: /bundle.js
+    body_regex: (?is)FrontendApplicationConfigProvider
+  - method: GET
+    path: /bundle.js
+    body_regex: (?is)@theia/core

@@ -1,0 +1,12 @@
+id: hayhooks
+name: hayhooks
+category: ai-infra
+description: REST API service for deepset Haystack, used for deploying and managing Haystack pipelines with support for pipeline deployment, status queries, and OpenAI-compatible endpoints.
+match:
+  any:
+  - method: GET
+    path: /status
+    body_regex: (?is)Hayhooks
+  - method: GET
+    path: /docs
+    body_regex: (?is)Hayhooks

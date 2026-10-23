@@ -1,0 +1,13 @@
+id: xinference
+name: Xinference
+category: ai-infra
+description: Xorbits Inference (Xinference) is an open-source platform to streamline the operation and integration of a wide array of AI models. With Xinference, you’re empowered to run inference using any open-source LLMs, embedding models, and multimodal models either in the cloud or on your own premises, and create robust AI-driven applications.
+match:
+  any:
+  - method: GET
+    path: /ui/
+    body_regex: (?is)<title>Xinference</title>
+version:
+  method: GET
+  path: /v1/cluster/version
+  body_regex: '"version":"(.*?)"}'

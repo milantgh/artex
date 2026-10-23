@@ -1,0 +1,12 @@
+id: huggingface-tgi
+name: huggingface-tgi
+category: ai-infra
+description: Hugging Face Text Generation Inference 服务，用于高性能部署大语言模型。
+match:
+  any:
+  - method: GET
+    path: /info
+    body_regex: (?is)^(?=.*"model_id":)(?=.*"model_pipeline_tag":)
+  - method: GET
+    path: /info
+    body_regex: (?is)^(?=.*"model_id")(?=.*"model_dtype")(?=.*"max_batch_total_tokens")(?=.*"docker_label")

@@ -1,0 +1,9 @@
+id: betterchatgpt
+name: betterchatgpt
+category: ai-infra
+description: Better ChatGPT - Enhanced open-source ChatGPT UI clone.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*Better\ ChatGPT)(?=.*Play\ and\ chat\ smarter\ with\ BetterChatGPT)

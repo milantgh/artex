@@ -1,0 +1,16 @@
+id: autogen-studio
+name: autogen-studio
+category: ai-infra
+description: Web UI platform for Microsoft AutoGen multi-agent framework, supporting team orchestration, session management, and visual debugging of multi-agent workflows.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>AutoGen\ Studio
+  - method: GET
+    path: /api/version
+    body_regex: (?is)^(?=.*Version\ retrieved\ successfully)(?=.*"version")
+version:
+  method: GET
+  path: /api/version
+  body_regex: '"version":\s*"(\d+\.\d+(?:\.\d+)?)'

@@ -1,0 +1,9 @@
+id: upsonic
+name: upsonic
+category: ai-infra
+description: Upsonic is an open-source AI agent framework for building production-ready agents with MCP tool integration, safety policies, and multi-agent coordination.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Upsonic</title>

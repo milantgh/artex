@@ -1,0 +1,12 @@
+id: ragflow
+name: ragflow
+category: ai-infra
+description: 一个开源RAG引擎，通过深度文档理解增强AI能力，提供准确的、引用支持的回答。
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>RAGFlow</title>
+  - method: GET
+    path: /v1/system/healthz
+    body_regex: (?is)"doc_engine"

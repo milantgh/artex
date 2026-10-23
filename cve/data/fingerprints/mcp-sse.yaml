@@ -1,0 +1,9 @@
+id: mcp-sse
+name: mcp sse
+category: ai-infra
+description: Anthropic Context MCP Protocol fingerprinting
+match:
+  any:
+  - method: GET
+    path: /messages/
+    body_regex: (?is)session_id\ is\ required

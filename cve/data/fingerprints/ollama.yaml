@@ -1,0 +1,19 @@
+id: ollama
+name: Ollama
+vendor: Ollama
+category: llm-serving
+description: "Ollama 本地大模型服务 / OpenAI 兼容网关"
+match:
+  any:
+    - path: /
+      status: 200
+      body_contains: "Ollama is running"
+    - path: /api/tags
+      status: 200
+      body_regex: '"models"\s*:'
+    - path: /api/version
+      status: 200
+      body_regex: '"version"\s*:\s*"[0-9.]+'
+version:
+  path: /api/version
+  body_regex: '"version"\s*:\s*"([0-9.]+)"'

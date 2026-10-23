@@ -1,0 +1,9 @@
+id: envoy-ai-gateway
+name: envoy-ai-gateway
+category: ai-infra
+description: Envoy AI Gateway - Unified access to Generative AI services built on Envoy Gateway.
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":"Envoy\ AI\ Gateway"

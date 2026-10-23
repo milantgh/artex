@@ -1,0 +1,9 @@
+id: portkey-ai-gateway
+name: portkey-ai-gateway
+category: ai-infra
+description: Portkey AI Gateway - Blazing fast unified gateway for 200+ LLM providers.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)AI\ Gateway\ says\ hey!

@@ -1,0 +1,9 @@
+id: emlog
+name: Emlog
+category: ai-infra
+description: Emlog Pro is a PHP and MySQL based blog/CMS system with built-in AI/LLM integration (admin AI settings page, include/service/ai.php for chat, image generation, and tool-call execution against configured LLM providers). The default front-end template exposes an unauthenticated blog index whose HTML contains the emlog-specific emAuthConfig JS object.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)^(?=.*window\.emAuthConfig)(?=.*rss\.php)

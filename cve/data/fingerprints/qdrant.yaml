@@ -1,0 +1,16 @@
+id: qdrant
+name: qdrant
+category: ai-infra
+description: Qdrant is an open-source vector database and similarity search engine for embedding-based AI applications.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)qdrant\ \-\ vector\ search\ engine
+  - method: GET
+    path: /collections
+    body_regex: (?is)^(?=.*"result")(?=.*"collections")(?=.*"status":"ok")
+version:
+  method: GET
+  path: /
+  body_regex: '"version":"(\d+\.\d+\.?\d+?)"'

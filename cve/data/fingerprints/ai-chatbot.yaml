@@ -1,0 +1,8 @@
+id: ai-chatbot
+name: ai-chatbot
+category: ai-infra
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Next\.js\ Chatbot\ Template</title>

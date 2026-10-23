@@ -1,0 +1,9 @@
+id: blinko
+name: blinko
+category: ai-infra
+description: Blinko is an open-source AI-powered note-taking application with MCP (Model Context Protocol) integration support.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Blinko</title>

@@ -1,0 +1,12 @@
+id: lm-studio
+name: lm-studio
+category: ai-infra
+description: LM Studio - Local LLM server with OpenAI-compatible API for running models on your machine.
+match:
+  any:
+  - method: GET
+    path: /lmstudio-greeting
+    body_regex: (?is)^(?=.*"lmstudio")(?=.*true)
+  - method: GET
+    path: /api/v0/models
+    body_regex: (?is)^(?=.*"compatibility_type")(?=.*"max_context_length")(?=.*"publisher")

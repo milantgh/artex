@@ -1,0 +1,12 @@
+id: crawl4ai
+name: crawl4ai
+category: ai-infra
+description: Crawl4AI is an open-source LLM-friendly web crawler and scraper with a Docker API server running on port 11235
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Home\ \-\ Crawl4AI\ Documentation</title>
+  - method: GET
+    path: /playground
+    body_regex: (?is)Crawl4AI

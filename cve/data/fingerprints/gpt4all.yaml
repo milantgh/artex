@@ -1,0 +1,9 @@
+id: gpt4all
+name: gpt4all
+category: ai-infra
+description: GPT4All - Local LLM server for running open-source models on any device.
+match:
+  any:
+  - method: GET
+    path: /v1/models
+    body_regex: (?is)"owned_by":"humanity"

@@ -1,0 +1,72 @@
+id: ai-agent-config
+name: AI-Agent-Config
+category: ai-infra
+description: AI Agent 配置文件（如 claude_desktop_config.json、.cursor/mcp.json、.trae/mcp.json 等）通过 HTTP 可公开访问，可能泄露 MCP Server 地址、API 密钥等敏感信息。
+match:
+  any:
+  - method: GET
+    path: /claude_desktop_config.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /.claude.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /.claude.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"numStartups")
+  - method: GET
+    path: /.claude.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"oauthAccount")
+  - method: GET
+    path: /.mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /.cursor/mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /.trae/mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /mcp_settings.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /.continue/config.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"models")(?=.*"provider")
+  - method: GET
+    path: /cline_mcp_settings.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /mcp_config.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")
+  - method: GET
+    path: /.vscode/mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"servers")(?=.*"command")
+  - method: GET
+    path: /.vscode/mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"servers")(?=.*"url")
+  - method: GET
+    path: /.vscode/mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")(?=.*"command")
+  - method: GET
+    path: /.vscode/mcp.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"mcpServers")(?=.*"url")
+  - method: GET
+    path: /.config/zed/settings.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"context_servers")
+  - method: GET
+    path: /.config/zed/settings.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"language_models")
+  - method: GET
+    path: /.config/zed/settings.json
+    body_regex: (?is)^(?=.*(?:^\s*\{))(?=.*"assistant")
+  - method: GET
+    path: /.config/goose/config.yaml
+    body_regex: '(?is)GOOSE_PROVIDER:'
+  - method: GET
+    path: /.config/goose/config.yaml
+    body_regex: '(?is)GOOSE_MODEL:'
+  - method: GET
+    path: /.config/goose/config.yaml
+    body_regex: (?is)^(?=.*extensions:)(?=.*enabled:)
+  - method: GET
+    path: /.env
+    body_regex: (?is)(OPENAI_API_KEY|ANTHROPIC_API_KEY|GEMINI_API_KEY|OPENROUTER_API_KEY|DEEPSEEK_API_KEY|HUNYUAN_API_KEY)\s*=\s*[A-Za-z0-9_\-]{16,}

@@ -1,0 +1,9 @@
+id: jan
+name: jan
+category: ai-infra
+description: Jan AI - Local OpenAI-compatible API server for running LLMs on your machine.
+match:
+  any:
+  - method: GET
+    path: /openapi.json
+    body_regex: (?is)"title":\ "Jan\ API\ Server\ Endpoints"

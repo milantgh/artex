@@ -1,0 +1,9 @@
+id: astron-agent
+name: astron-agent
+category: ai-infra
+description: Astron Agent (iFlytek) is an open-source agentic workflow platform for building and running AI agents.
+match:
+  any:
+  - method: GET
+    path: /
+    body_regex: (?is)<title>Astron\ Agent</title>
